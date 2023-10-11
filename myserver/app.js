@@ -10,6 +10,9 @@ const mongoose = require('mongoose');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
+//api
+const userAPIRouter=require('./routes/api/UserApi');
+
 var app = express();
 
 // view engine setup
@@ -31,9 +34,12 @@ mongoose.connect('mongodb+srv://tungh3210:tung@cluster0.cmonbw2.mongodb.net/Grad
   .then(() => console.log('>>>>>>>>>> DB Connected!!!!!!'))
   .catch(err => console.log('>>>>>>>>> DB Error: ', err));
 
+// improt api
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+//http:localhost:3000/api/user
+app.use('/api/user',userAPIRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
