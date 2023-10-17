@@ -44,7 +44,7 @@ router.post('/add-new', [UploadFile.single('image')], async (req, res, next) => 
     try {
         let { file, body } = req;
         if (file) {
-            file = `http://192.168.1.3:3000/images/${file.filename}`;
+            file = `http://192.168.1.8:3000/images/${file.filename}`;
             body = { ...body, image: file };
         }
         const { title, price, discount, size, color, quantity, image, description, brand } = body;
@@ -64,7 +64,7 @@ router.post('/edit-new/:id', [UploadFile.single('image')], async (req, res, next
         let { file, body } = req;
         let { id } = req.params;
         if (file) {
-            file = `http://192.168.1.3:3000/images/${file.filename}`;
+            file = `http://192.168.1.8:3000/images/${file.filename}`;
             body = { ...body, image: file };
         }
         const { title, price, discount, size, color, quantity, image, description, brand } = body;
@@ -81,7 +81,7 @@ router.post('/upload-image', [UploadFile.single('image')], async (req, res, next
     try {
         const { file } = req;
         if (file) {
-            const link = `http://192.168.1.3:3000/images/${file.filename}`;
+            const link = `http://192.168.1.8:3000/images/${file.filename}`;
             return res.status(200).json({ result: true, link: link });
         }
 
@@ -101,7 +101,7 @@ router.post('/upload-images', [UploadFile.array('image', 2)], async (req, res, n
             const links = [];
             for (let index = 0; index < files.length; index++) {
                 const element = files[index];
-                links.push = `http://192.168.1.3:3000/images/${element.filename}`;
+                links.push = `http://192.168.1.8:3000/images/${element.filename}`;
             }
 
             return res.status(200).json({ result: true, links: links });
