@@ -3,6 +3,8 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var path = require('path');
 var cookieParser = require('cookie-parser');
+//session. cookies
+const session = require('express-session');
 var logger = require('morgan');
 var crypto = require('crypto');
 var nodemailer = require('nodemailer');
@@ -10,7 +12,8 @@ var nodemailer = require('nodemailer');
 //mongo
 const mongoose = require('mongoose');
 const User = require('./models/user');
-const Order = require('./models/order');
+require('./components/brand/BrandModel');
+require('./components/products/ProductModel');
 
 
 
@@ -19,6 +22,8 @@ var usersRouter = require('./routes/users');
 
 //api
 const userAPIRouter=require('./routes/api/UserApi');
+const brandAPIRouter=require('./routes/api/BrandApi');
+const productAPIRouter=require('./routes/api/ProductApi');
 
 var app = express();
 
@@ -31,6 +36,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+//khai báo thông tin session
+app.use(session({
+  secret: 'iloveyou',
+  resave: true,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}));
 
 //connect database
 //mongodb://127.0.0.1:27017/MyFpoly
@@ -46,8 +58,14 @@ mongoose.connect('mongodb+srv://tungh3210:tung@cluster0.cmonbw2.mongodb.net/Grad
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+//Dành cho API
 //http:localhost:3000/api/user
 app.use('/api/user',userAPIRouter);
+//http:localhost:3000/api/brand
+app.use('/api/brand',brandAPIRouter);
+//http:localhost:3000/api/product
+app.use('/api/product',productAPIRouter);
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
