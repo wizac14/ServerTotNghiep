@@ -16,6 +16,14 @@ const getProductById = async(id)=>{
     }
 }
 
+const getProductByBrandName = async(brandName)=>{
+    try {
+        return await ProductService.getProductByBrandName(brandName);
+    } catch (error) { 
+        return null;
+    }
+}
+
 const deleteProductById = async (id) => {
     try {
         return await ProductService.deleteProductById(id);
@@ -25,9 +33,9 @@ const deleteProductById = async (id) => {
    
 }
 
-const addNewProduct = async(title, price,discount,size,color, quantity, image, description, brand)=>{
+const addNewProduct = async(title, price, discount, size, color, quantity, image, description, brandName)=>{
     try {
-        return await ProductService.addNewProduct(title, price,discount,size,color, quantity, image, description, brand);
+        return await ProductService.addNewProduct(title, price, discount, size, color, quantity, image, description, brandName);
     } catch (error) {
         return false;
     }
@@ -44,4 +52,4 @@ const updateProductById = async(id,title, price,discount,size,color, quantity, i
 
 
 
-module.exports = { getAllProducts,getProductById, deleteProductById, addNewProduct ,updateProductById}
+module.exports = { getAllProducts,getProductById, deleteProductById, addNewProduct ,updateProductById, getProductByBrandName}

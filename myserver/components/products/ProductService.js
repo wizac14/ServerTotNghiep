@@ -1,5 +1,6 @@
 
 const ProductModel = require('./ProductModel');
+const BrandModel = require('../brand/BrandModel');
 
 const getAllProducts = async () => {
     try {
@@ -18,6 +19,26 @@ const getProductById = async (id) => {
       return null;
     }
   }
+
+  const getProductByBrandName = async (brandName) => {
+    try {
+      // Tìm ID của thương hiệu dựa trên tên
+      const brand = await BrandModel.findOne({ name: brandName });
+
+      if (!brand) {
+          console.log('Không tìm thấy thương hiệu.');
+          return null;
+      }
+
+      // Sử dụng ID của thương hiệu để tìm sản phẩm
+      return await ProductModel.find({ brand: brand._id });
+
+  } catch (error) {
+      console.log('Lỗi khi lấy sản phẩm theo thương hiệu:', error);
+      return null;
+  }
+}
+
 const deleteProductById = async (id) => {
     try {
         await ProductModel.findByIdAndDelete(id);
@@ -28,9 +49,16 @@ const deleteProductById = async (id) => {
       }
 
 }
-const addNewProduct = async (title, price, discount, size, color, quantity, image, description, brand) => {
+const addNewProduct = async (title, price, discount, size, color, quantity, image, description, brandName) => {
     try {
-        const newProduct = { title, price, discount, size, color, quantity, image, description, brand }
+      // Tìm thương hiệu theo tên
+      const brand = await BrandModel.findOne({ name: brandName });
+
+      if (!brand) {
+          console.log('Không tìm thấy thương hiệu.');
+          return false;
+      }
+        const newProduct = { title, price, discount, size, color, quantity, image, description, brand}
         const p = new ProductModel(newProduct);
         await p.save();
         return true;
@@ -66,7 +94,7 @@ const updateProductById = async (id, title, price, discount, size, color, quanti
   
 
 
-module.exports = { getAllProducts,getProductById, deleteProductById, addNewProduct, updateProductById}
+module.exports = { getAllProducts,getProductById, deleteProductById, addNewProduct, updateProductById, getProductByBrandName}
 
 var data = [{
     "_id": 1,
