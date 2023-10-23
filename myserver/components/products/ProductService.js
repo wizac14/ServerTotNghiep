@@ -62,11 +62,29 @@ const updateProductById = async (id, title, price, discount, size, color, quanti
       console.log("Update product by id error: ", error);
       return false;
     }
+  };
+  //tiemkiem san pham theo ten
+ const filterProductByBrand=async(brand)=>{
+  try {
+    return await ProductModel.find({brand}
+  // // lowsn hon 10
+  //   // quantity:{$gt:1000} 
+  //   // so luong nho hon 5 hoac so luong lon hon 50
+  //   $or:[{quantity:{ $lt:5}},{quantity:{ $gt:50}}]
+  //    ,
+  //      // gia tien trong khoan tu 10 den 100
+  //   price:{$gte:10,$lte:100}
+);
+    
+    
+  } catch (error) {
+    console.log("finr product by id error: ",error);
   }
+ }
   
 
 
-module.exports = { getAllProducts,getProductById, deleteProductById, addNewProduct, updateProductById}
+module.exports = { getAllProducts,getProductById, deleteProductById, addNewProduct, updateProductById,filterProductByBrand}
 
 var data = [{
     "_id": 1,

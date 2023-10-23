@@ -40,8 +40,16 @@ const updateProductById = async(id,title, price,discount,size,color, quantity, i
         return false;
     }
 }
+const filterProductByBrand=async(brand)=>{
+    try {
+        return await ProductService.filterProductByBrand(brand);
+    } catch (error) {
+        console.log("filter by brand error",error);
+    }
+    return null;
+}
 
 
 
 
-module.exports = { getAllProducts,getProductById, deleteProductById, addNewProduct ,updateProductById}
+module.exports = { getAllProducts,getProductById, deleteProductById, addNewProduct ,updateProductById,filterProductByBrand}
