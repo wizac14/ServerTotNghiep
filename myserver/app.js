@@ -14,6 +14,7 @@ const mongoose = require('mongoose');
 const User = require('./models/user');
 require('./components/brand/BrandModel');
 require('./components/products/ProductModel');
+require('./components/favorite/FavoriteModel');
 
 
 
@@ -24,6 +25,7 @@ var usersRouter = require('./routes/users');
 const userAPIRouter=require('./routes/api/UserApi');
 const brandAPIRouter=require('./routes/api/BrandApi');
 const productAPIRouter=require('./routes/api/ProductApi');
+const favoriteAPIRouter=require('./routes/api/FavoriteApi');
 
 var app = express();
 
@@ -65,6 +67,8 @@ app.use('/api/user',userAPIRouter);
 app.use('/api/brand',brandAPIRouter);
 //http:localhost:3000/api/product
 app.use('/api/product',productAPIRouter);
+//http:localhost:3000/api/favorite
+app.use('/api/favorite',favoriteAPIRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const twilio = require('twilio');
-const bodyParser = require('body-parser');
+// const twilio = require('twilio');
+// const bodyParser = require('body-parser');
 
 //http://localhost:3000/api/user
 const userController = require("../../components/user/UserController");
