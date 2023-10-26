@@ -42,7 +42,7 @@ router.get('/get-by-brand', async (req, res, next) => {
 });
 
 // http://localhost:3000/api/product/delete-by-id/:id
-router.delete('/delete-by-id/:id', async (req, res, next) => {
+router.delete('/delete/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
     const products = await ProductController.deleteProductById(id);
@@ -53,25 +53,11 @@ router.delete('/delete-by-id/:id', async (req, res, next) => {
 });
 // http://localhost:3000/api/product/add-new
 // api
-router.post('/add-new', [UploadFile.single('image')], async (req, res, next) => {
+router.post('/', async (req, res, next) => {
   try {
-    let { file, body } = req;
-    if (file) {
-      file = `http://192.168.1.8:3000/images/${file.filename}`;
-      body = { ...body, image: file };
-    }
-    const { title, price, discount, size, color, quantity, image, description, brand } = body;
-    const product = await ProductController.addNewProduct(
-      title,
-      price,
-      discount,
-      size,
-      color,
-      quantity,
-      image,
-      description,
-      brand
-    );
+    let { body } = req;
+    const product = await ProductController.addNewProduct(body);
+
     return res.status(200).json({ result: true, product: product });
   } catch (error) {
     console.log('Add new product error: ', error);
@@ -81,27 +67,11 @@ router.post('/add-new', [UploadFile.single('image')], async (req, res, next) => 
 
 // http://localhost:3000/api/product/edit-new/:id
 // api
-router.post('/edit-new/:id', [UploadFile.single('image')], async (req, res, next) => {
+router.put('/update/:id', async (req, res, next) => {
   try {
-    let { file, body } = req;
+    let { body } = req;
     let { id } = req.params;
-    if (file) {
-      file = `http://192.168.1.8:3000/images/${file.filename}`;
-      body = { ...body, image: file };
-    }
-    const { title, price, discount, size, color, quantity, image, description, brand } = body;
-    const product = await ProductController.updateProductById(
-      id,
-      title,
-      price,
-      discount,
-      size,
-      color,
-      quantity,
-      image,
-      description,
-      brand
-    );
+    const product = await ProductController.updateProductById(id, body);
     return res.status(200).json({ result: true, product: product });
   } catch (error) {
     console.log('Edit new product error: ', error);
