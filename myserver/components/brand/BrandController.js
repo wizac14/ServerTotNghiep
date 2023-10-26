@@ -1,10 +1,10 @@
-const BrandService=require("./BrandService");
-const getAllBrand = async () => {
-    try {
-        return await BrandService.getBrand();
-    } catch (error) {
-        throw error;
-    }
-    
-}
-module.exports = { getAllBrand}
+const BrandService = require('./BrandService');
+
+const getAllBrands = async () => {
+  try {
+    return await BrandService.getAllBrands();
+  } catch (error) {
+    throw error;
+  }
+};
+module.exports = { getAllBrands };
