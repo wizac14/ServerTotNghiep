@@ -117,17 +117,17 @@ router.post('/upload-images', [UploadFile.array('image', 2)], async (req, res, n
 });
 // http://localhost:3000/api/product/filter-by-brand
 router.get('/filter-by-brand', [], async (req, res, next) => {
-    try {
-        const { brand } = req.query;
-        // console.log(brand)
-        const recipe = await ProductController.filterProductByBrand(brand);
-        if (recipe) {
-            return res.status(200).json({ result: true, recipe: recipe });
-        }
-        return res.status(400).json({ result: false });
-    } catch (error) {
-        return res.status(500).json({ result: false, recipe: null });
+  try {
+    const { brand } = req.query;
+    // console.log(brand)
+    const recipe = await ProductController.filterProductByBrand(brand);
+    if (recipe) {
+      return res.status(200).json({ result: true, recipe: recipe });
     }
+    return res.status(400).json({ result: false });
+  } catch (error) {
+    return res.status(500).json({ result: false, recipe: null });
+  }
 });
 
 module.exports = router;
