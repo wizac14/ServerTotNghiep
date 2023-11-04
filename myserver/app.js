@@ -23,6 +23,7 @@ const userAPIRouter = require('./routes/api/UserApi');
 const brandAPIRouter = require('./routes/api/BrandApi');
 const productAPIRouter = require('./routes/api/ProductApi');
 const uploadAPIRouter = require('./routes/api/UploadApi');
+const CartAPIRouter=require('./routes/api/CartApi');
 
 var app = express();
 //cors
@@ -71,6 +72,8 @@ app.use('/api/brand', brandAPIRouter);
 //http:localhost:3000/api/product
 app.use('/api/product', productAPIRouter);
 app.use('/api/upload', uploadAPIRouter);
+//http:localhost:3000/api/cart
+app.use('/api/cart', CartAPIRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
