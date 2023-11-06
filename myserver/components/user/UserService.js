@@ -1,3 +1,4 @@
+const UserModel = require('./UserModel');
 const userModel = require('./UserModel');
 const bcrypt = require('bcryptjs');
 //1. kiem tra email,password
@@ -55,4 +56,38 @@ const register = async (email, password, name,address,phoneNumber) => {
     return false;
 
 }
-module.exports = { login, register };
+//// //name: { type: String },
+// email: { type: String },
+// password: { type: String },
+// address:{type: String},
+// phoneNumber:{type:Number},
+// gender
+// role:{type: Number,default:1},
+// image: { type: String, default: "" },
+const updateUser = async (name, email, password, address,phoneNumber, gender,dob, image) => {
+    try {
+        const user = await UserModel.findOne({ email: email })
+        if (user) {
+            user.name = name ? name : user.name;
+            user.email=email? email:user.email;
+            user.password = password ? password : user.password;
+            user.address = address ? address : user.address;
+            user.gender = gender ? gender : user.gender;
+            user.phoneNumber=phoneNumber?phoneNumber:user.phoneNumber;
+            user.dob = dob ? dob : user.dob;
+            user.image = image ? image : user.image;
+
+
+            await user.save();
+            console.log("INFO USER:", user);
+
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.log("Update User  error", error)
+        return false;
+    }
+}
+module.exports = { login, register,updateUser };
