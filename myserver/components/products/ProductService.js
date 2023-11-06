@@ -113,6 +113,32 @@ const updateProductById = async (id, updateProduct) => {
   }
 };
 
+const getQuatityByProductIdAndSizeAndColor = async (product_id, size, color) => {
+  try {
+    let product = await ProductModel.findOne(
+      {
+        _id: product_id,
+        variances: {
+          $elemMatch: { color: color, 'varianceDetail.size': size },
+        },
+      },
+      { 'variances.$': 1 } //get the first element that matched the condition
+    );
+
+    let productVarianceDetail = await product.variances[0].varianceDetail.find(
+      (detail) => detail.size.toString() === size.toString()
+    );
+
+    return {
+      product_id: product?._id,
+      color: color,
+      size: productVarianceDetail.size,
+      quantity: productVarianceDetail.quantity,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
 module.exports = {
   getAllProducts,
   getProductById,
@@ -120,6 +146,7 @@ module.exports = {
   addNewProduct,
   updateProductById,
   getProductByBrandName,
+  getQuatityByProductIdAndSizeAndColor,
 };
 
 var data = [

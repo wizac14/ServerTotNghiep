@@ -46,7 +46,13 @@ const updateProductById = async (id, updateProduct) => {
     return false;
   }
 };
-
+const getQuatityByProductIdAndSizeAndColor = async (product_id, size, color) => {
+  try {
+    return await ProductService.getQuatityByProductIdAndSizeAndColor(product_id, size, color);
+  } catch (error) {
+    throw error;
+  }
+};
 module.exports = {
   getAllProducts,
   getProductById,
@@ -54,4 +60,5 @@ module.exports = {
   addNewProduct,
   updateProductById,
   getProductByBrandName,
+  getQuatityByProductIdAndSizeAndColor,
 };
