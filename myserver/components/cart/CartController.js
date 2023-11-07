@@ -22,8 +22,18 @@ const removeProductFromCart = async (productId) => {
     throw error;
   }
 };
+
+const updateQuantity = async (quantity, id) => {
+  try {
+    return await CartService.updateQuantity(quantity, id);
+  } catch (error) {
+    return false;
+  }
+};
+
 module.exports = {
   getCartByIdUser,
   addNewCart,
+  updateQuantity,
   removeProductFromCart,
 };

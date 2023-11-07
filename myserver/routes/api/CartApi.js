@@ -45,4 +45,20 @@ router.delete('/remove-from-cart/:_id', async (req, res, next) => {
     return res.status(500).json({ result: false, cart: null });
   }
 });
+
+//http://localhost:3000/api/cart/update-quantity
+router.post('/update-quantity', async (req, res, next) => {
+  try {
+    const { quantity, id } = req.body;
+    const cart = await CartController.updateQuantity(quantity, id);
+    if (cart) {
+      return res.status(200).json({ result: true, cart: cart, message: 'Update Success' });
+    } else {
+      return res.status(400).json({ result: false, cart: null, message: ' Quantity not exist' });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ result: false, cart: null });
+  }
+});
 module.exports = router;

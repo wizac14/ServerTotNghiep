@@ -9,4 +9,4 @@ const cartSchema = new Schema({
   size: { type: Number },
   quantity: { type: Number },
 });
-module.exports = mongoose.models.favorite || mongoose.model('cart', cartSchema);
+module.exports = mongoose.models.cart || mongoose.model('cart', cartSchema);

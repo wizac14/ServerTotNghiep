@@ -15,6 +15,7 @@ const getCartIdUser = async (idUser) => {
     return null;
   }
 };
+
 const addNewCart = async (idUser, idProduct, color, size, quantity) => {
   try {
     const cart = await CartModel.findOne({
@@ -37,6 +38,7 @@ const addNewCart = async (idUser, idProduct, color, size, quantity) => {
     return false; // Thêm mới cart thất bại
   }
 };
+
 const removeProductFromCart = async (productId) => {
   try {
     const result = await CartModel.deleteOne({ _id: productId });
@@ -46,8 +48,23 @@ const removeProductFromCart = async (productId) => {
     return false;
   }
 };
+
+const updateQuantity = async (quantity, id) => {
+  try {
+    const cart = await CartModel.findOne({ _id: id });
+    if (cart) {
+      cart.quantity = quantity ? quantity : cart.quantity;
+      await cart.save();
+      return cart;
+    }
+  } catch (error) {
+    console.log('update Quantity  error', error);
+    return false;
+  }
+};
 module.exports = {
   getCartIdUser,
   addNewCart,
   removeProductFromCart,
+  updateQuantity,
 };
