@@ -35,8 +35,8 @@ router.post('/login', async (req, res, next) => {
 //http://localhost:3000/api/user/register
 router.post('/register', async (req, res, next) => {
   try {
-    const { email, password, name, address, phoneNumber } = req.body;
-    const user = await userController.register(email, password, name, address, phoneNumber);
+    const {email, password, name,address,phoneNumber,isActive,role ,gender,dob, image } = req.body;
+    const user = await userController.register(email, password, name,address,phoneNumber,isActive,role ,gender,dob, image);
     if (user) {
       return res.status(200).json({ result: true, user: user });
     } else {
@@ -48,33 +48,23 @@ router.post('/register', async (req, res, next) => {
     return res.status(500).json({ result: false, message: 'loi he thong' });
   }
 });
-//http://localhost:3000/api/user/update
-router.post('/update', async (req, res, next) => {
+//http://localhost:3000/api/user/update/
+router.put('/update/:id', async (req, res, next) => {
   try {
-    const { name, email, password, address, phoneNumber, gender, dob, image } = req.body;
-    // console.log(email, password, name, description,gender, dob, avatar, role, createAt, updateAt, isLogin);
-
-    const user = await userController.updateUser(
-      name,
-      email,
-      password,
-      address,
-      phoneNumber,
-      gender,
-      dob,
-      image
-    );
-    // console.log(user)
-    if (user) {
-      return res.status(200).json({ result: true, user: user, message: 'Update Success' });
-    } else {
-      return res.status(400).json({ result: false, user: null, message: ' user not exist' });
-    }
+      const { id } = req.params
+      const { name, email, phoneNumber, address, gender, dob, image } = req.body;
+      const user = await userController.updateUser(id, name, email, phoneNumber, address, gender, dob, image);
+      console.log(user)
+      if (user) {
+          return res.status(200).json({ result: true, user: user, message: "Update Success" })
+      } else {
+          return res.status(400).json({ result: false, user: null, message: " user not exist" })
+      }
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ result: false, user: null });
+      console.log(error)
+      return res.status(500).json({ result: false, user: null })
   }
-});
+})
 //http://localhost:3000/api/user/upload-image
 router.post('/upload-image', [upload.single('image')], async (req, res, next) => {
   try {
@@ -90,4 +80,37 @@ router.post('/upload-image', [upload.single('image')], async (req, res, next) =>
     return res.status(500).json({ result: false });
   }
 });
+
+// http://localhost:3000/api/user/get-all
+router.get('/get-all', [], async (req, res, next) => {
+  try {
+    const user = await userController.getAllUsers();
+    return res.status(200).json({ result: true, user: user });
+  } catch (error) {
+    console.log('Get all error: ', error);
+    return res.status(500).json({ result: false, user: null });
+  }
+});
+// http://localhost:3000/api/user/get-by-id?id=
+router.get('/get-by-id', async (req, res, next) => {
+  try {
+    const { id } = req.query;
+    const user = await userController.getUserById(id);
+    return res.status(200).json({ result: true, user: user });
+  } catch (error) {
+    console.log('Get by id error: ', error);
+    return res.status(500).json({ result: false, user: null });
+  }
+});
+// http://localhost:3000/api/user/delete/:id
+router.delete('/delete/:id', async (req, res, next) => {
+  try {
+      const { id } = req.params;
+      const user = await userController.deleteUserById(id);
+      return res.status(200).json({ result: true, users: user  });
+  } catch (error) {
+      return res.status(500).json({ result: false, users: null });
+  }
+});
+
 module.exports = router;

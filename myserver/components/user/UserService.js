@@ -30,7 +30,7 @@ const login = async (email, password) => {
 
 }
 
-const register = async (email, password, name,address,phoneNumber) => {
+const register = async (email, password, name,address,phoneNumber,isActive,role,gender,dob, image) => {
     try {
         // kiem tra email da co hnay chua
         // selec * form users where email=email
@@ -43,7 +43,7 @@ const register = async (email, password, name,address,phoneNumber) => {
         // ma hoa password
         var salt = bcrypt.genSaltSync(10);
         var hash = bcrypt.hashSync(password, salt);
-        const newUser = { email, password:hash, name ,address,phoneNumber,role:1};
+        const newUser = { email, password:hash, name ,address,phoneNumber,isActive,role,gender,dob,image};
         const u = new userModel(newUser);
         await u.save();
         return true;
@@ -64,23 +64,20 @@ const register = async (email, password, name,address,phoneNumber) => {
 // gender
 // role:{type: Number,default:1},
 // image: { type: String, default: "" },
-const updateUser = async (name, email, password, address,phoneNumber, gender,dob, image) => {
+const updateUser = async (id, name, email, phoneNumber, address, gender, dob, image) => {
     try {
-        const user = await UserModel.findOne({ email: email })
+        const user = await userModel.findById(id)
+        console.log("sadad", user);
         if (user) {
             user.name = name ? name : user.name;
-            user.email=email? email:user.email;
-            user.password = password ? password : user.password;
+            user.email = email ? email : user.email;
+            user.phoneNumber = phoneNumber ? phoneNumber : user.phoneNumber;
             user.address = address ? address : user.address;
             user.gender = gender ? gender : user.gender;
-            user.phoneNumber=phoneNumber?phoneNumber:user.phoneNumber;
             user.dob = dob ? dob : user.dob;
             user.image = image ? image : user.image;
-
-
             await user.save();
             console.log("INFO USER:", user);
-
             return true;
         } else {
             return false;
@@ -90,4 +87,31 @@ const updateUser = async (name, email, password, address,phoneNumber, gender,dob
         return false;
     }
 }
-module.exports = { login, register,updateUser };
+const getAllUsers = async () => {
+    try {
+      return await userModel.find();
+    } catch (error) {
+      console.log('Get all users error', error);
+      throw error;
+    }
+  };
+const getUserById = async (id) => {
+    try {
+    return await userModel.findById(id);
+    } catch (error) {
+    console.log('Get users by id error', error);
+    return null;
+    }
+};
+  const deleteUserById = async (id) => {
+    try {
+      await userModel.findByIdAndDelete(id);
+      return true;
+    } catch (error) {
+        console('register error: ', error);
+      console.log('Delete users by id error', error);
+      return false;
+    }
+}
+
+module.exports = { login, register,updateUser , getAllUsers, getUserById, deleteUserById};
