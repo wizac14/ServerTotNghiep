@@ -130,4 +130,20 @@ router.get('/filter-by-brand', [], async (req, res, next) => {
   }
 });
 
+//http://localhost:3000/api/product/get-quantity?product_id=6540963521c273ca720f8809&size=42&color=cream-white
+router.get('/get-quantity', async (req, res, next) => {
+  try {
+    const { product_id, size, color } = req.query;
+    const result = await ProductController.getQuatityByProductIdAndSizeAndColor(
+      product_id,
+      size,
+      color
+    );
+
+    return res.status(200).json({ result: result });
+  } catch (error) {
+    return res.status(500).json({ result: 'Not found' });
+  }
+});
+
 module.exports = router;

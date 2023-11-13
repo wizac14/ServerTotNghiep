@@ -8,8 +8,11 @@ const userSchema = new Schema({
     email: { type: String },
     password: { type: String },
     address:{type: String},
-    phoneNumber:{type:String},
+    phoneNumber:{type:Number},
+    gender:{type:String},
     role:{type: Number,default:1},
+    dob:{type:String},
+    image: { type: String, default: "" },
     //1:user,100:adim,1000:system
     //1,2
     //or xor and not
