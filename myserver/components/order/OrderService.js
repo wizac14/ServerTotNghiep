@@ -4,26 +4,21 @@ const crypto = require('crypto');
 const productService = require('../products/ProductService');
 const { OrderStatusEnum } = require('./OrderStatusEnum');
 const { default: mongoose } = require('mongoose');
-const createOrder = async (
-  userId,
-  totalAmount,
-  address,
-  phoneNumber,
-  products,
-  isPaid,
-  paymentTransactionRef
-) => {
+const cartService = require('../cart/CartService');
+
+const createOrder = async (orderData) => {
   try {
+    let { userId, totalAmount, address, phoneNumber, products, isPaid, paymentDetail } = orderData;
     let status = OrderStatusEnum.ORDERED;
     if (isPaid) {
       status = OrderStatusEnum.PURCHASED;
     }
     await productService.updateQuantityForProductByOrder(products, status);
-
+    cartService.removeAllProductsFromCart(userId);
     let newOrder = new OrderModel({
       userId: userId,
       detail: products,
-      paymentTransactionRef: paymentTransactionRef,
+      paymentTransactionRef: paymentDetail ? paymentDetail.transactionRef : '',
       status: status,
       totalAmount: totalAmount,
       address: address,

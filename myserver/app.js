@@ -25,6 +25,7 @@ const productAPIRouter = require('./routes/api/ProductApi');
 const uploadAPIRouter = require('./routes/api/UploadApi');
 const CartAPIRouter = require('./routes/api/CartApi');
 const OrderAPIRouter = require('./routes/api/OrderApi');
+const paymentAPIRouter = require('./routes/api/PaymentApi');
 
 var app = express();
 //cors
@@ -76,6 +77,7 @@ app.use('/api/upload', uploadAPIRouter);
 //http:localhost:3000/api/cart
 app.use('/api/cart', CartAPIRouter);
 app.use('/api/order', OrderAPIRouter);
+app.use('/api/payment', paymentAPIRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

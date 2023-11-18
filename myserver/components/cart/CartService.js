@@ -74,6 +74,17 @@ const removeProductFromCart = async (productId) => {
   }
 };
 
+const removeAllProductsFromCart = async (idUser) => {
+  try {
+    const result = await CartModel.deleteMany({ idUser: idUser });
+    return result;
+  } catch (error) {
+    console.log('Lỗi khi xóa tất cả sản phẩm trong giỏ hàng: ', error);
+    return false;
+  }
+};
+
+
 const updateQuantity = async (quantity, id) => {
   try {
     const cart = await CartModel.findOne({ _id: id });
@@ -92,4 +103,5 @@ module.exports = {
   addNewCart,
   removeProductFromCart,
   updateQuantity,
+  removeAllProductsFromCart
 };

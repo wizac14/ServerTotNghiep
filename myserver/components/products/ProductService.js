@@ -125,7 +125,13 @@ const updateProductById = async (id, updateProduct) => {
 
 const getQuatityByProductIdAndSizeAndColor = async (product_id, size, color) => {
   try {
+    console.log(product_id, size, color);
     const product = await ProductModel.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(product_id),
+        },
+      },
       {
         $unwind: {
           path: '$variances',
@@ -138,7 +144,6 @@ const getQuatityByProductIdAndSizeAndColor = async (product_id, size, color) => 
       },
       {
         $match: {
-          _id: new mongoose.Types.ObjectId(product_id),
           'variances.varianceDetail.size': Number(size),
           'variances.color': color,
         },
@@ -169,6 +174,9 @@ const updateQuantityForProductByOrder = async (orderProducts, orderStatus) => {
         orderProduct.size,
         orderProduct.color
       );
+      if (!existingProduct) {
+        throw new Error('Không tìm thấy productId=' + orderProduct.productId);
+      }
       let newQuantity = existingProduct.quantity - orderProduct.quantity;
       if (orderStatus === OrderStatusEnum.REFUNDED || orderStatus === OrderStatusEnum.CANCELED) {
         newQuantity = existingProduct.quantity + orderProduct.quantity;
