@@ -1,75 +1,84 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const favoriteController = require('../../components/Favorite/FavoriteController');
-// // http://localhost:3000/favorite/api/get-all
-// router.get('/get-all', [], async (req, res, next) => {
-//     try {
-//         const { idUser } = req.query
-//         const favorite = await favoriteController.getAllFavorite(idUser);
-//         if (favorite) {
-//             return res.status(200).json({ message: "Success", result: true, favorite: favorite, });
-//         }
-//         return res.status(400).json({ message: "Failed", result: false, favorite: null, });
+const favoriteService = require('../../components/Favorite/FavoriteService');
 
-//     } catch (error) {
-//         return res.status(500).json({ result: false, recipe: null });
-//     }
-// });
+//http://localhost:3000/api/favorite/add-to-favorites
+router.post('/add-to-favorites/', async (req, res, next) => {
+  const { idUser, idProduct } = req.body;
 
-// http://localhost:3000/api/favorite/get-by-idUser?idUser
-router.get('/get-by-idUser', async (req, res, next) => {
-    try {
-        const { idUser } = req.query;
-        const favorite = await favoriteController.getFavoriteByIdUser(idUser);
-        if (favorite) {
-            return res.status(200).json({ result: true, favorite: favorite, message: "Success" });
-        }
-        return res.status(400).json({ result: false, favorite: null, message: "Failed" });
-    } catch (error) {
-        return res.status(500).json({ result: false, product: null });
+  try {
+    const favoriteProduct = await favoriteService.addToFavorites(idUser, idProduct);
+
+    if (!favoriteProduct) {
+      return res.status(404).json({
+        result: false,
+        message: 'Sản phẩm không tồn tại hoặc đã có trong danh sách yêu thích',
+      });
     }
-});
-// http://localhost:3000/api/favorite/get-by-idProduct?idProduct
-router.get('/get-by-idProduct', async (req, res, next) => {
-    try {
-        const { idProduct } = req.query;
-        const favorite = await favoriteController.getFavoriteById(idProduct);
-        if (favorite) {
-            return res.status(200).json({ result: true, favorite: favorite, message: "Success" });
-        }
-        return res.status(400).json({ result: false, favorite: null, message: "Failed" });
-    } catch (error) {
-        return res.status(500).json({ result: false, product: null });
-    }
+
+    return res.status(200).json({ result: true, favoriteProduct });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ result: false, message: 'Lỗi khi thêm sản phẩm vào danh sách yêu thích' });
+  }
 });
 
+//http://localhost:3000/api/favorite/:userId
+router.get('/:userId', async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
 
-// http://localhost:3000/api/favorite/delete-by-id
-router.delete('/delete-by-id', async (req, res, next) => {
-    try {
-        const { idProduct, idUser } = req.query;
-        // console.log(idRecipe, idUser);
-        const favorite = await favoriteController.deleteFavoriteById(idProduct, idUser);
-        if (favorite) {
-            return res.status(200).json({ result: true, favorite: favorite, message: "delete success" });
-        }
-        return res.status(400).json({ result: false, favorite: null, message: "Failed to delete" });
-    } catch (error) {
-        return res.status(500).json({ result: false, favorite: null });
-    }
+    const favorites = await favoriteService.getFavoritesByUser(userId);
+
+    res.status(200).json({ result: true, favorites });
+  } catch (error) {
+    res.status(500).json({ result: false, error: error.message });
+  }
 });
-// http://localhost:3000/api/favorite/new-to-favorite
-router.post('/new-to-favorite', async (req, res, next) => {
-    try {
-        const { idUser, idProduct } = req.body;
-        // console.log(idUser, idRecipe)
-        const favorite = await favoriteController.addNewFavorite(idUser, idProduct);
-        if (favorite) {
-            return res.status(200).json({ result: true, favorite: favorite, message: "Add new success" });
-        }
-        return res.status(400).json({ result: false, favorite: null, message: "Failed to add new" });
-    } catch (error) {
-        return res.status(500).json({ result: false, favorite: null });
-    }
+
+//http://localhost:3000/api/favorite/check-favorite/:userId/:productId
+router.get('/check-favorite/:userId/:productId', async (req, res, next) => {
+  const { userId, productId } = req.params;
+
+  try {
+    const isFavorite = await favoriteService.checkFavorite(userId, productId);
+
+    return res.status(200).json({ isFavorite });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Lỗi khi kiểm tra sản phẩm yêu thích' });
+  }
 });
+
+//http://localhost:3000/api/favorite/remove-from-favorites/:userId/:productId
+router.delete('/remove-from-favorites/:userId/:productId', async (req, res, next) => {
+  const { userId, productId } = req.params;
+
+  try {
+    // Gọi hàm xóa sản phẩm khỏi danh sách yêu thích từ service
+    const removedFavorite = await favoriteService.removeFromFavorites(userId, productId);
+
+    if (removedFavorite) {
+      return res.status(200).json({
+        result: true,
+        message: 'Sản phẩm đã được xóa khỏi danh sách yêu thích',
+      });
+    } else {
+      return res.status(404).json({
+        result: false,
+        message: 'Sản phẩm không tồn tại trong danh sách yêu thích hoặc đã bị xóa',
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      result: false,
+      message: 'Lỗi khi xóa sản phẩm khỏi danh sách yêu thích',
+    });
+  }
+});
+
 module.exports = router;

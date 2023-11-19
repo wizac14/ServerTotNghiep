@@ -1,53 +1,40 @@
 const favoriteService = require('./FavoriteService');
 
-// const getAllFavorite = async (idUser) => {
-//     try {
-//         return await favoriteService.getAllFavorite(idUser);
+// const addToFavorites = async (req, res) => {
+//   const { idUser, idProduct } = req.body;
 
-//     } catch (error) {
-//         return false;
+//   try {
+//     const favoriteProduct = await favoriteService.addToFavorites(idUser, idProduct);
+
+//     if (!favoriteProduct) {
+//       return res
+//         .status(404)
+//         .json({
+//           result: false,
+//           message: 'Sản phẩm không tồn tại hoặc đã có trong danh sách yêu thích',
+//         });
 //     }
-// }
 
-const deleteFavoriteById = async ( idProduct,idUser) => {
-    try {
-        return await favoriteService.deleteFavoriteById( idProduct,idUser);
-    } catch (error) {
-        return false;
-    }
-}
+//     return res.status(200).json({ result: true, favoriteProduct });
+//   } catch (error) {
+//     console.error(error);
+//     return res
+//       .status(500)
+//       .json({ result: false, message: 'Lỗi khi thêm sản phẩm vào danh sách yêu thích' });
+//   }
+// };
 
-const addNewFavorite = async (idUser,idProduct) => {
-    try {
-        return await favoriteService.addNewFavorite(idUser, idProduct);
-    } catch (error) {
-        return false;
-    }
-}
+// const getFavoritesByUser = async (req, res) => {
+//   try {
+//     const userId = req.params.userId; // Lấy userId từ request
 
-const getFavoriteByIdUser = async (idUser) => {
-    try {
-        return await favoriteService.getFavoriteByIdUser(idUser);
-    } catch (error) {
-        return null;
-    }
-}
-const getFavoriteById = async (idProduct) => {
-    try {
-        return await favoriteService.getFavoriteById(idProduct);
-    } catch (error) {
-        return null;
-    }
-}
+//     // Gọi service để lấy danh sách yêu thích của người dùng
+//     const favorites = await favoriteService.getFavoritesByUser(userId);
 
+//     res.status(200).json({ success: true, favorites });
+//   } catch (error) {
+//     res.status(500).json({ success: false, error: error.message });
+//   }
+// };
 
-// const updateFavoriteById = async (id, name, quantity, unit) => {
-//     try {
-//         return await favoriteService.updateFavoriteById(id, name, quantity, unit);
-//     } catch (error) {
-//         return false;
-//     }
-// }
-
-
-module.exports = {  deleteFavoriteById, addNewFavorite, getFavoriteByIdUser, getFavoriteById };
+module.exports = {};
