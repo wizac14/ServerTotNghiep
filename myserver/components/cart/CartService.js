@@ -1,4 +1,6 @@
+const ProductModel = require('../products/ProductModel');
 const CartModel = require('./CartModel');
+const ProductService = require('../products/ProductService');
 
 const getCartIdUser = async (idUser) => {
   try {
@@ -16,6 +18,29 @@ const getCartIdUser = async (idUser) => {
   }
 };
 
+// const addNewCart = async (idUser, idProduct, color, size, quantity) => {
+//   try {
+//     const cart = await CartModel.findOne({
+//       idUser: idUser,
+//       idProduct: idProduct,
+//       color: color,
+//       size: size,
+//       quantity: quantity,
+//     });
+//     if (cart) {
+//       return false; // Cart đã tồn tại
+//     } else {
+//       const newCart = { idUser, idProduct, color, size, quantity };
+//       const cartInstance = new CartModel(newCart);
+//       await cartInstance.save();
+//       return true; // Thêm mới cart thành công
+//     }
+//   } catch (error) {
+//     console.log('Lỗi khi thêm mới cart: ', error);
+//     return false; // Thêm mới cart thất bại
+//   }
+// };
+
 const addNewCart = async (idUser, idProduct, color, size, quantity) => {
   try {
     const cart = await CartModel.findOne({
@@ -23,19 +48,42 @@ const addNewCart = async (idUser, idProduct, color, size, quantity) => {
       idProduct: idProduct,
       color: color,
       size: size,
-      quantity: quantity,
     });
+
     if (cart) {
-      return false; // Cart đã tồn tại
+      // Nếu giỏ hàng đã tồn tại, kiểm tra và cập nhật số lượng
+      const newQuantity = cart.quantity + quantity;
+      console.log(newQuantity);
+
+      // Tìm thông tin sản phẩm để kiểm tra số lượng ban đầu
+      const productQuantity = await ProductService.getQuatityByProductIdAndSizeAndColor(
+        idProduct,
+        size,
+        color
+      );
+
+      if (productQuantity) {
+        if (newQuantity <= productQuantity.quantity) {
+          // Cập nhật số lượng giỏ hàng nếu nhỏ hơn hoặc bằng số lượng sản phẩm ban đầu
+          cart.quantity = newQuantity;
+          await cart.save();
+        } else {
+          // Cập nhật giỏ hàng với số lượng sản phẩm ban đầu nếu số lượng mới lớn hơn
+          cart.quantity = productQuantity.quantity;
+          await cart.save();
+        }
+      }
     } else {
+      // Nếu giỏ hàng chưa tồn tại, thêm mới giỏ hàng
       const newCart = { idUser, idProduct, color, size, quantity };
       const cartInstance = new CartModel(newCart);
       await cartInstance.save();
-      return true; // Thêm mới cart thành công
     }
+
+    return true; // Thêm mới hoặc cập nhật giỏ hàng thành công
   } catch (error) {
-    console.log('Lỗi khi thêm mới cart: ', error);
-    return false; // Thêm mới cart thất bại
+    console.log('Lỗi khi thêm mới hoặc cập nhật giỏ hàng: ', error);
+    return false; // Thêm mới hoặc cập nhật giỏ hàng thất bại
   }
 };
 

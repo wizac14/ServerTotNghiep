@@ -6,6 +6,13 @@ const addNewCart = async (idUser, idRecipe, color, size, quantity) => {
     return false;
   }
 };
+// const addNewCart = async (idUser, idProduct, color, size, quantity) => {
+//   try {
+//     return await CartService.addNewCart(idUser, idProduct, color, size, quantity);
+//   } catch (error) {
+//     return false;
+//   }
+// };
 
 const getCartByIdUser = async (idUser) => {
   try {

@@ -21,7 +21,7 @@ router.get('/get-by-idUser', async (req, res, next) => {
 router.post('/new-to-cart', async (req, res, next) => {
   try {
     const { idUser, idProduct, color, size, quantity } = req.body;
-    // console.log(idUser, idRecipe)
+    // console.log(idUser, idRecipe);
     const cart = await CartController.addNewCart(idUser, idProduct, color, size, quantity);
     if (cart) {
       return res.status(200).json({ result: true, cart: cart, message: 'Add new success' });

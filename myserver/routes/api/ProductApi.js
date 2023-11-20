@@ -115,6 +115,7 @@ router.post('/upload-images', [UploadFile.array('image', 2)], async (req, res, n
     return res.status(500).json({ result: false });
   }
 });
+
 // http://localhost:3000/api/product/filter-by-brand
 router.get('/filter-by-brand', [], async (req, res, next) => {
   try {
