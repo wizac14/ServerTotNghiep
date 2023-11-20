@@ -7,6 +7,13 @@ const getAllProducts = async () => {
     throw error;
   }
 };
+const getLimitedProducts = async (limit) => {
+  try {
+    return await ProductService.getLimitedProducts(limit);
+  } catch (error) {
+    throw error;
+  }
+};
 const getProductById = async (id) => {
   try {
     return await ProductService.getProductById(id);
@@ -53,6 +60,23 @@ const getQuatityByProductIdAndSizeAndColor = async (product_id, size, color) => 
     throw error;
   }
 };
+
+const searchByName = async (name) => {
+  try {
+    return await ProductService.searchByName(name);
+  } catch (error) {
+    console.error('Search by name error: ', error);
+    throw error;
+  }
+};
+
+const searchProductsByBrand = async (query) => {
+  try {
+    return await ProductService.searchProductsByBrand(query);
+  } catch (error) {
+    return null;
+  }
+};
 module.exports = {
   getAllProducts,
   getProductById,
@@ -61,4 +85,7 @@ module.exports = {
   updateProductById,
   getProductByBrandName,
   getQuatityByProductIdAndSizeAndColor,
+  searchByName,
+  searchProductsByBrand,
+  getLimitedProducts,
 };

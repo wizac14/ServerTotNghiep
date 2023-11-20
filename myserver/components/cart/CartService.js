@@ -18,29 +18,6 @@ const getCartIdUser = async (idUser) => {
   }
 };
 
-// const addNewCart = async (idUser, idProduct, color, size, quantity) => {
-//   try {
-//     const cart = await CartModel.findOne({
-//       idUser: idUser,
-//       idProduct: idProduct,
-//       color: color,
-//       size: size,
-//       quantity: quantity,
-//     });
-//     if (cart) {
-//       return false; // Cart đã tồn tại
-//     } else {
-//       const newCart = { idUser, idProduct, color, size, quantity };
-//       const cartInstance = new CartModel(newCart);
-//       await cartInstance.save();
-//       return true; // Thêm mới cart thành công
-//     }
-//   } catch (error) {
-//     console.log('Lỗi khi thêm mới cart: ', error);
-//     return false; // Thêm mới cart thất bại
-//   }
-// };
-
 const addNewCart = async (idUser, idProduct, color, size, quantity) => {
   try {
     const cart = await CartModel.findOne({
@@ -97,6 +74,17 @@ const removeProductFromCart = async (productId) => {
   }
 };
 
+const removeAllProductsFromCart = async (idUser) => {
+  try {
+    const result = await CartModel.deleteMany({ idUser: idUser });
+    return result;
+  } catch (error) {
+    console.log('Lỗi khi xóa tất cả sản phẩm trong giỏ hàng: ', error);
+    return false;
+  }
+};
+
+
 const updateQuantity = async (quantity, id) => {
   try {
     const cart = await CartModel.findOne({ _id: id });
@@ -115,4 +103,5 @@ module.exports = {
   addNewCart,
   removeProductFromCart,
   updateQuantity,
+  removeAllProductsFromCart
 };

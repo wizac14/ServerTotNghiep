@@ -23,8 +23,10 @@ const userAPIRouter = require('./routes/api/UserApi');
 const brandAPIRouter = require('./routes/api/BrandApi');
 const productAPIRouter = require('./routes/api/ProductApi');
 const uploadAPIRouter = require('./routes/api/UploadApi');
-const CartAPIRouter=require('./routes/api/CartApi');
-const favoriteAPIRouter=require('./routes/api/FavoriteApi');
+const CartAPIRouter = require('./routes/api/CartApi');
+const OrderAPIRouter = require('./routes/api/OrderApi');
+const paymentAPIRouter = require('./routes/api/PaymentApi');
+const favoriteAPIRouter = require('./routes/api/FavoriteApi');
 
 var app = express();
 //cors
@@ -75,6 +77,8 @@ app.use('/api/product', productAPIRouter);
 app.use('/api/upload', uploadAPIRouter);
 //http:localhost:3000/api/cart
 app.use('/api/cart', CartAPIRouter);
+app.use('/api/order', OrderAPIRouter);
+app.use('/api/payment', paymentAPIRouter);
 //http:localhost:3000/api/favorite
 app.use('/api/favorite', favoriteAPIRouter);
 
