@@ -3,10 +3,25 @@ const BrandModel = require('../brand/BrandModel');
 const firebaseAdmin = require('../../utils/firebaseAdmin');
 const { default: mongoose } = require('mongoose');
 const { OrderStatusEnum } = require('../order/OrderStatusEnum');
+const paginationUtil = require('../../utils/paginationUtil');
 
-const getAllProducts = async () => {
+const getAllProducts = async (offset, size) => {
   try {
-    return await ProductModel.find().populate('brand', '');
+    const paginationValue = paginationUtil.validateAndGetValues(offset, size);
+    const products = await ProductModel.find()
+      .skip(paginationValue.offset)
+      .limit(paginationValue.pageSize)
+      .populate('brand', '');
+    const total = await countAll();
+    const metaData = paginationUtil.getMetaData(
+      paginationValue.offset,
+      paginationValue.pageSize,
+      total
+    );
+    return {
+      products: products,
+      metaData: metaData,
+    };
   } catch (error) {
     console.log('Get all products error', error);
     throw error;
@@ -243,6 +258,11 @@ const searchProductsByBrand = async (query) => {
     console.log('Lỗi khi tìm kiếm sản phẩm theo thương hiệu:', error);
     return null;
   }
+};
+
+const countAll = async () => {
+  const count = await ProductModel.count();
+  return count;
 };
 module.exports = {
   getAllProducts,

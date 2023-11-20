@@ -1,8 +1,8 @@
 const ProductService = require('./ProductService');
 
-const getAllProducts = async () => {
+const getAllProducts = async (offset, size) => {
   try {
-    return await ProductService.getAllProducts();
+    return await ProductService.getAllProducts(offset, size);
   } catch (error) {
     throw error;
   }
