@@ -139,8 +139,51 @@ const getAllOrders = async () => {
   }
 };
 
+const getUserOrders = async (userId) => {
+  try {
+    const orders = await OrderModel.find({ userId }).populate('detail.productId');
+
+    if (!orders || orders.length === 0) {
+      return { success: false, message: 'No orders found for this user.' };
+    }
+
+    return { success: true, orders };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
+const getUserOrderCount = async (userId) => {
+  try {
+    const orderCount = await OrderModel.countDocuments({ userId });
+
+    return { success: true, orderCount };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
+const getProductCountInOrder = async (orderId) => {
+  try {
+    const order = await OrderModel.findById(orderId);
+
+    if (!order) {
+      return { success: false, message: 'Order not found.' };
+    }
+
+    const productCount = order.detail.length;
+
+    return { success: true, productCount };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
 module.exports = {
   createOrder,
   getAllOrders,
   getOrderByOrderId,
+  getUserOrders,
+  getUserOrderCount,
+  getProductCountInOrder,
 };

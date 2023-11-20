@@ -7,8 +7,9 @@ const UploadFile = require('../../middle/UploadFile');
 // api get all product
 router.get('/get-all', [], async (req, res, next) => {
   try {
-    const products = await ProductController.getAllProducts();
-    return res.status(200).json({ result: true, products: products });
+    let { pageSize, offset } = req.query;
+    const { products, metaData } = await ProductController.getAllProducts(offset, pageSize);
+    return res.status(200).json({ result: true, products: products, metaData: metaData });
   } catch (error) {
     console.log('Get all error: ', error);
     return res.status(500).json({ result: false, products: null });
