@@ -36,5 +36,12 @@ const getAllUsers = async () => {
       throw false;
     }
 }
+const changePassword = async (email, oldPassword, newPassword) => {
+  try {
+      return await userService.changePassword(email, oldPassword, newPassword);
+  } catch (error) {
+      throw error;
+  }
+}
   
-module.exports={login,register,updateUser, getAllUsers, getUserById, deleteUserById};
+module.exports={login,register,updateUser, getAllUsers, getUserById, deleteUserById, changePassword};

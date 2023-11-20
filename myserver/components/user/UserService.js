@@ -113,5 +113,28 @@ const getUserById = async (id) => {
       return false;
     }
 }
-
-module.exports = { login, register,updateUser , getAllUsers, getUserById, deleteUserById};
+const changePassword = async (email, oldPassword, newPassword) => {
+    try {
+        const user = await userModel.findOne({ email: email })
+        if (user) {
+            console.log("INFO USER:", user);
+            const isPasswordValid = await bcrypt.compare(oldPassword, user.password)
+            console.log(isPasswordValid)
+            if (isPasswordValid) {
+                const salt = bcrypt.genSaltSync(10);
+                const hash = bcrypt.hashSync(newPassword, salt);
+                user.password = hash
+                await user.save();
+                return true;
+            } else {
+                return false
+            }
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.log("Change Password got an error: ", error);
+        throw error;
+    }
+}
+module.exports = { login, register,updateUser , getAllUsers, getUserById, deleteUserById, changePassword};

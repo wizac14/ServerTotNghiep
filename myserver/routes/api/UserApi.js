@@ -70,7 +70,7 @@ router.post('/upload-image', [upload.single('image')], async (req, res, next) =>
   try {
     const { file } = req;
     if (file) {
-      const link = `http://192.168.1.80:3000/images/${file.filename}`;
+      const link = `http://192.168.1.3:3000/images/${file.filename}`;
       return res.status(200).json({ result: true, link: link });
     }
 
@@ -112,5 +112,20 @@ router.delete('/delete/:id', async (req, res, next) => {
       return res.status(500).json({ result: false, users: null });
   }
 });
-
+//http://localhost:3000/api/user/change-password
+router.put('/change-password', [], async (req, res, next) => {
+  try {
+      const { email, oldPassword, newPassword } = req.body;
+      console.log(email, oldPassword, newPassword)
+      const user = await userController.changePassword(email, oldPassword, newPassword);
+      console.log(user)
+      if (user) {
+          res.status(200).json({ result: true, message: "Change Password Success" })
+      } else {
+          res.status(400).json({ result: false, massage: "Change Password Failed" })
+      }
+  } catch (error) {
+      res.status(500).json({ message: 'Lỗi máy chủ' });
+  }
+});
 module.exports = router;
