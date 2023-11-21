@@ -7,8 +7,9 @@ const UploadFile = require('../../middle/UploadFile');
 // api get all product
 router.get('/get-all', [], async (req, res, next) => {
   try {
-    const products = await ProductController.getAllProducts();
-    return res.status(200).json({ result: true, products: products });
+    let { pageSize, offset } = req.query;
+    const { products, metaData } = await ProductController.getAllProducts(offset, pageSize);
+    return res.status(200).json({ result: true, products: products, metaData: metaData });
   } catch (error) {
     console.log('Get all error: ', error);
     return res.status(500).json({ result: false, products: null });
@@ -115,19 +116,20 @@ router.post('/upload-images', [UploadFile.array('image', 2)], async (req, res, n
     return res.status(500).json({ result: false });
   }
 });
+
 // http://localhost:3000/api/product/filter-by-brand
 router.get('/filter-by-brand', [], async (req, res, next) => {
-    try {
-        const { brand } = req.query;
-        // console.log(brand)
-        const recipe = await ProductController.filterProductByBrand(brand);
-        if (recipe) {
-            return res.status(200).json({ result: true, recipe: recipe });
-        }
-        return res.status(400).json({ result: false });
-    } catch (error) {
-        return res.status(500).json({ result: false, recipe: null });
+  try {
+    const { brand } = req.query;
+    // console.log(brand)
+    const recipe = await ProductController.filterProductByBrand(brand);
+    if (recipe) {
+      return res.status(200).json({ result: true, recipe: recipe });
     }
+    return res.status(400).json({ result: false });
+  } catch (error) {
+    return res.status(500).json({ result: false, recipe: null });
+  }
 });
 
 // http://localhost:3000/api/product/search
@@ -144,4 +146,56 @@ router.get('/search', async (req, res, next) => {
 
 
 
+//http://localhost:3000/api/product/get-quantity?product_id=6540963521c273ca720f8809&size=42&color=cream-white
+router.get('/get-quantity', async (req, res, next) => {
+  try {
+    const { product_id, size, color } = req.query;
+    const result = await ProductController.getQuatityByProductIdAndSizeAndColor(
+      product_id,
+      size,
+      color
+    );
+
+    return res.status(200).json({ result: result });
+  } catch (error) {
+    return res.status(500).json({ result: 'Not found' });
+  }
+});
+
+// http://localhost:3000/api/product/search-by-name
+// api search products by name
+router.get('/search-by-name', async (req, res) => {
+  try {
+    const { query } = req.query;
+    const products = await ProductController.searchByName(query);
+    return res.status(200).json({ result: true, products: products });
+  } catch (error) {
+    console.error('Search by name route error: ', error);
+    return res.status(500).json({ result: false, products: null });
+  }
+});
+//http://localhost:3000/api/product/search-by-brand
+// api search products by brand
+router.get('/search-by-brand', async (req, res, next) => {
+  try {
+    const { query } = req.query;
+    const products = await ProductController.searchProductsByBrand(query);
+    return res.status(200).json({ result: true, products: products });
+  } catch (error) {
+    console.log('Search products by brand error: ', error);
+    return res.status(500).json({ result: false, products: null });
+  }
+});
+//http://localhost:3000/api/product/get-limited
+// api get san pham limit ( 6 san pham )
+router.get('/get-limited', [], async (req, res, next) => {
+  try {
+    const limit = req.query.limit || 6; // Số sản phẩm mặc định là 6 nếu không có tham số limit
+    const products = await ProductController.getLimitedProducts(limit);
+    return res.status(200).json({ result: true, products: products });
+  } catch (error) {
+    console.log('Get limited products error: ', error);
+    return res.status(500).json({ result: false, products: null });
+  }
+});
 module.exports = router;

@@ -1,6 +1,7 @@
 const userService = require('./UserService');
 const mailer = require('nodemailer');
 const UserModel = require('./UserModel');
+const userService=require('./UserService');
 
 const login = async (email, password) => {
     return await userService.login(email, password);
