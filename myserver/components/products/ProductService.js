@@ -1,12 +1,37 @@
 const ProductModel = require('./ProductModel');
 const BrandModel = require('../brand/BrandModel');
 const firebaseAdmin = require('../../utils/firebaseAdmin');
+const { default: mongoose } = require('mongoose');
+const { OrderStatusEnum } = require('../order/OrderStatusEnum');
+const paginationUtil = require('../../utils/paginationUtil');
 
-const getAllProducts = async () => {
+const getAllProducts = async (offset, size) => {
   try {
-    return await ProductModel.find().populate('brand', '');
+    const paginationValue = paginationUtil.validateAndGetValues(offset, size);
+    const products = await ProductModel.find()
+      .skip(paginationValue.offset)
+      .limit(paginationValue.pageSize)
+      .populate('brand', '');
+    const total = await countAll();
+    const metaData = paginationUtil.getMetaData(
+      paginationValue.offset,
+      paginationValue.pageSize,
+      total
+    );
+    return {
+      products: products,
+      metaData: metaData,
+    };
   } catch (error) {
     console.log('Get all products error', error);
+    throw error;
+  }
+};
+const getLimitedProducts = async (limit) => {
+  try {
+    return await ProductModel.find().limit(limit).populate('brand', '');
+  } catch (error) {
+    console.log('Get limited products error', error);
     throw error;
   }
 };
@@ -115,29 +140,129 @@ const updateProductById = async (id, updateProduct) => {
 
 const getQuatityByProductIdAndSizeAndColor = async (product_id, size, color) => {
   try {
-    let product = await ProductModel.findOne(
+    console.log(product_id, size, color);
+    const product = await ProductModel.aggregate([
       {
-        _id: product_id,
-        variances: {
-          $elemMatch: { color: color, 'varianceDetail.size': size },
+        $match: {
+          _id: new mongoose.Types.ObjectId(product_id),
         },
       },
-      { 'variances.$': 1 } //get the first element that matched the condition
-    );
-
-    let productVarianceDetail = await product.variances[0].varianceDetail.find(
-      (detail) => detail.size.toString() === size.toString()
-    );
-
-    return {
-      product_id: product?._id,
-      color: color,
-      size: productVarianceDetail.size,
-      quantity: productVarianceDetail.quantity,
-    };
+      {
+        $unwind: {
+          path: '$variances',
+        },
+      },
+      {
+        $unwind: {
+          path: '$variances.varianceDetail',
+        },
+      },
+      {
+        $match: {
+          'variances.varianceDetail.size': Number(size),
+          'variances.color': color,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          color: '$variances.color',
+          quantity: '$variances.varianceDetail.quantity',
+          size: '$variances.varianceDetail.size',
+        },
+      },
+    ]);
+    return product[0];
   } catch (error) {
+    console.log(error);
     throw error;
   }
+};
+
+const updateQuantityForProductByOrder = async (orderProducts, orderStatus) => {
+  const session = await ProductModel.startSession();
+  session.startTransaction();
+  try {
+    for (const orderProduct of orderProducts) {
+      const existingProduct = await getQuatityByProductIdAndSizeAndColor(
+        orderProduct.productId,
+        orderProduct.size,
+        orderProduct.color
+      );
+      if (!existingProduct) {
+        throw new Error('Không tìm thấy productId=' + orderProduct.productId);
+      }
+      let newQuantity = existingProduct.quantity - orderProduct.quantity;
+      if (orderStatus === OrderStatusEnum.REFUNDED || orderStatus === OrderStatusEnum.CANCELED) {
+        newQuantity = existingProduct.quantity + orderProduct.quantity;
+      }
+      if (newQuantity < 0) {
+        throw new Error(
+          'Vượt quá số lượng đơn hàng trong kho: productId=' + orderProduct.productId
+        );
+      } else {
+        await ProductModel.updateOne(
+          {
+            _id: orderProduct.productId,
+          },
+          {
+            $set: {
+              'variances.$[colorFilter].varianceDetail.$[sizeFilter].quantity': newQuantity,
+            },
+          },
+          {
+            arrayFilters: [
+              { 'colorFilter.color': orderProduct.color },
+              { 'sizeFilter.size': orderProduct.size },
+            ],
+            session: session,
+          }
+        );
+      }
+    }
+    await session.commitTransaction();
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    await session.endSession();
+  }
+};
+
+const searchByName = async (name) => {
+  try {
+    // Sử dụng biểu thức chính quy (regular expression) để tìm kiếm tên sản phẩm
+    const regex = new RegExp(name, 'i');
+    const products = await ProductModel.find({ title: regex });
+
+    return products;
+  } catch (error) {
+    console.error('Search by name error in ProductService: ', error);
+    throw error;
+  }
+};
+
+const searchProductsByBrand = async (query) => {
+  try {
+    // Tìm ID của thương hiệu dựa trên tên
+    const brand = await BrandModel.findOne({ name: query });
+
+    if (!brand) {
+      console.log('Không tìm thấy thương hiệu.');
+      return null;
+    }
+
+    // Sử dụng ID của thương hiệu để tìm sản phẩm
+    return await ProductModel.find({ brand: brand._id }).populate('brand', ''); // Nếu cần hiển thị thông tin về thương hiệu
+  } catch (error) {
+    console.log('Lỗi khi tìm kiếm sản phẩm theo thương hiệu:', error);
+    return null;
+  }
+};
+
+const countAll = async () => {
+  const count = await ProductModel.count();
+  return count;
 };
 module.exports = {
   getAllProducts,
@@ -147,6 +272,10 @@ module.exports = {
   updateProductById,
   getProductByBrandName,
   getQuatityByProductIdAndSizeAndColor,
+  searchByName,
+  searchProductsByBrand,
+  getLimitedProducts,
+  updateQuantityForProductByOrder,
 };
 
 var data = [

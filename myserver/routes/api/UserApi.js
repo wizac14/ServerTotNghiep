@@ -70,7 +70,9 @@ router.post('/upload-image', [upload.single('image')], async (req, res, next) =>
   try {
     const { file } = req;
     if (file) {
+
       const link = `http://192.168.1.3:3000/images/${file.filename}`;
+
       return res.status(200).json({ result: true, link: link });
     }
 
