@@ -47,11 +47,19 @@ const updateProductById = async (id, updateProduct) => {
   }
 };
 
+const searchProduct = async (title, color) => {
+  try {
+    return await ProductService.searchProduct(title, color);
+  } catch (error) {
+    throw error;
+  }
+}
+
+
 module.exports = {
   getAllProducts,
   getProductById,
   deleteProductById,
   addNewProduct,
   updateProductById,
-  getProductByBrandName,
-};
+  getProductByBrandName, searchProduct }

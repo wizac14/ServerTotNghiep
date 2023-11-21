@@ -8,9 +8,9 @@ const getAll = async (idUser) => {
     }
     return null;
 }
-const addFavorite = async ( product, idUser, createAt, updateAt) => {
+const addFavorite = async ( product, idUser,isFavorite) => {
     try {
-        return await FavoriteService.addFavorite( product, idUser, createAt, updateAt);
+        return await FavoriteService.addFavorite( product, idUser, isFavorite);
     } catch (error) {
         console.log('Add Favorite error: ', error);
     }

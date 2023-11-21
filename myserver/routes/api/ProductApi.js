@@ -84,7 +84,7 @@ router.post('/upload-image', [UploadFile.single('image')], async (req, res, next
   try {
     const { file } = req;
     if (file) {
-      const link = `http://192.168.1.8:3000/images/${file.filename}`;
+      const link = `http://192.168.1.2:3000/images/${file.filename}`;
       return res.status(200).json({ result: true, link: link });
     }
 
@@ -104,7 +104,7 @@ router.post('/upload-images', [UploadFile.array('image', 2)], async (req, res, n
       const links = [];
       for (let index = 0; index < files.length; index++) {
         const element = files[index];
-        links.push = `http://192.168.1.8:3000/images/${element.filename}`;
+        links.push = `http://192.168.1.2:3000/images/${element.filename}`;
       }
 
       return res.status(200).json({ result: true, links: links });
@@ -129,5 +129,19 @@ router.get('/filter-by-brand', [], async (req, res, next) => {
         return res.status(500).json({ result: false, recipe: null });
     }
 });
+
+// http://localhost:3000/api/product/search
+router.get('/search', async (req, res, next) => {
+  try {
+      const { title ,color} = req.query;
+      const products = await ProductController.searchProduct(title , color);
+      return res.status(200).json({ result: true, products: products });
+  } catch (error) {
+      console.log("Search product error: ", error);
+      return res.status(500).json({ result: false, products: null });
+  }
+});    
+
+
 
 module.exports = router;

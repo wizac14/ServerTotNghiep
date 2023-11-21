@@ -55,4 +55,24 @@ const register = async (email, password, name,address,phoneNumber) => {
     return false;
 
 }
-module.exports = { login, register };
+
+const changeForgotPassword = async (email, newPassword) => {
+    try {
+        const user = await userModel.findOne({ email: email })
+        console.log("INFO USER:", user);
+        if (user) {
+            const salt = bcrypt.genSaltSync(10);
+            const hash = bcrypt.hashSync(newPassword, salt);
+            user.password = hash
+            await user.save();
+            return true;
+        } else {
+            return false;
+            
+        }
+    } catch (error) {
+        console.log("Change Password got an error: ", error);
+        throw error;
+    }
+}
+module.exports = { login, register, changeForgotPassword };

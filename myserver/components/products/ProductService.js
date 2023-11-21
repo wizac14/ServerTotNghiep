@@ -12,7 +12,11 @@ const getAllProducts = async () => {
 };
 const getProductById = async (id) => {
   try {
-    return await ProductModel.findById(id).populate('brand', '');
+    const product = await ProductModel.findById(id).populate('brand', '');
+
+    const sizes = await product?.variances?.map((variance) => variance?.varianceDetail?.map((detail) => detail?.size));
+
+    return { ...product.toObject(), sizes: sizes.map((size) => size.size) };
   } catch (error) {
     console.log('Get products by id error', error);
     return null;
@@ -113,13 +117,32 @@ const updateProductById = async (id, updateProduct) => {
   }
 };
 
+
+const searchProduct = async (title , color) => {
+  try {
+    let query = {};
+    if(title){
+      query.title = { $regex: title, $options: 'i' };
+    }
+    
+    if(color){
+      query['variances.color'] = { $regex: color, $options: 'i'};
+    }
+    const products = await ProductModel.find(query).populate('brand', '');
+    return products;
+  } catch (error) {
+    console.log('Search product error', error);
+    throw error;
+  }
+}
+
 module.exports = {
   getAllProducts,
   getProductById,
   deleteProductById,
   addNewProduct,
   updateProductById,
-  getProductByBrandName,
+  getProductByBrandName, searchProduct
 };
 
 var data = [

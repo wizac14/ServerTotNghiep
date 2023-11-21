@@ -10,6 +10,8 @@ const userSchema = new Schema({
     address:{type: String},
     phoneNumber:{type:Number},
     role:{type: Number,default:1},
+    isVerified: { type: Boolean , default: false},
+    verificationCode: { type: String , default:'00000'},
     //1:user,100:adim,1000:system
     //1,2
     //or xor and not

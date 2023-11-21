@@ -9,6 +9,7 @@ const favoriteSchema = new Schema({
     idUser: {type: ObjectId, ref: 'user'}, //khoá ngoại
     createAt: { type: Date, default: Date.now},
     updateAt: { type: Date, default: Date.now },
+    isFavorite: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.models.favorite || mongoose.model('favorite', favoriteSchema);
