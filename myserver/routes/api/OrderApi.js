@@ -27,8 +27,8 @@ router.get('/all', async function (req, res, next) {
   }
 });
 
-//http://localhost:3000/api/order/:orderId
-router.get('/:orderId', async function (req, res, next) {
+//http://localhost:3000/api/order/get-order-detail/:orderId
+router.get('/get-order-detail/:orderId', async function (req, res, next) {
   const { orderId } = req.params;
   try {
     const orders = await orderService.getOrderByOrderId(orderId);
@@ -75,7 +75,7 @@ router.get('/user-orders/:userId', async (req, res) => {
       orders: ordersWithProductCount,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ result: false, error: error.message });
   }
 });
 
