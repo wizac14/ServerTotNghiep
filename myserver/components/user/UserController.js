@@ -1,7 +1,6 @@
 const userService = require('./UserService');
 const mailer = require('nodemailer');
 const UserModel = require('./UserModel');
-const userService=require('./UserService');
 
 const login = async (email, password) => {
     return await userService.login(email, password);
@@ -89,4 +88,14 @@ const transporter = mailer.createTransport({
 })
 
 
-module.exports = { login, register, sendVerifyCodeNew, sendVerifyCode, verifyCode, changeForgotPassword };
+const updateUser = async (name, email, password, address,phoneNumber, gender, dob,image , isVerified, verificationCode) => {
+    try {
+        return await userService.updateUser(name, email, password, address,phoneNumber, gender, dob,image ,isVerified, verificationCode);
+
+    } catch (error) {
+        return false;
+    }
+}
+
+
+module.exports = { login, register, sendVerifyCodeNew, sendVerifyCode, verifyCode, changeForgotPassword, updateUser };

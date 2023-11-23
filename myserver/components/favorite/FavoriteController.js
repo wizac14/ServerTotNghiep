@@ -1,30 +1,40 @@
-const  FavoriteService = require('./FavoriteService')
+const favoriteService = require('./FavoriteService');
 
-const getAll = async (idUser) => {
-    try {
-        return await FavoriteService.getAll(idUser);
-    } catch (error) {
-        console.log('Get All Favorite error: ', error);
-    }
-    return null;
-}
-const addFavorite = async ( product, idUser,isFavorite) => {
-    try {
-        return await FavoriteService.addFavorite( product, idUser, isFavorite);
-    } catch (error) {
-        console.log('Add Favorite error: ', error);
-    }
-    return null;
-}
+// const addToFavorites = async (req, res) => {
+//   const { idUser, idProduct } = req.body;
 
+//   try {
+//     const favoriteProduct = await favoriteService.addToFavorites(idUser, idProduct);
 
-const deleteFavoriteById = async (id) => {
-    try {
-        return await FavoriteService.deleteFavoriteById(id);
-    } catch (error) {
-        console.log('Delete Favorite By Id error: ', error);
-    }
-    return null;
-}
+//     if (!favoriteProduct) {
+//       return res
+//         .status(404)
+//         .json({
+//           result: false,
+//           message: 'Sản phẩm không tồn tại hoặc đã có trong danh sách yêu thích',
+//         });
+//     }
 
-module.exports ={getAll, deleteFavoriteById, addFavorite}
+//     return res.status(200).json({ result: true, favoriteProduct });
+//   } catch (error) {
+//     console.error(error);
+//     return res
+//       .status(500)
+//       .json({ result: false, message: 'Lỗi khi thêm sản phẩm vào danh sách yêu thích' });
+//   }
+// };
+
+// const getFavoritesByUser = async (req, res) => {
+//   try {
+//     const userId = req.params.userId; // Lấy userId từ request
+
+//     // Gọi service để lấy danh sách yêu thích của người dùng
+//     const favorites = await favoriteService.getFavoritesByUser(userId);
+
+//     res.status(200).json({ success: true, favorites });
+//   } catch (error) {
+//     res.status(500).json({ success: false, error: error.message });
+//   }
+// };
+
+module.exports = {};
