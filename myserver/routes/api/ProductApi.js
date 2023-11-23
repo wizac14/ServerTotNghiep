@@ -160,12 +160,10 @@ router.get('/search-by-name', async (req, res) => {
     return res.status(500).json({ result: false, products: null });
   }
 });
-//http://localhost:3000/api/product/search-by-brand
-// api search products by brand
 router.get('/search-by-brand', async (req, res, next) => {
   try {
-    const { query } = req.query;
-    const products = await ProductController.searchProductsByBrand(query);
+    const { brandName, productName } = req.query;
+    const products = await ProductController.searchProductsByBrand(brandName, productName);
     return res.status(200).json({ result: true, products: products });
   } catch (error) {
     console.log('Search products by brand error: ', error);
