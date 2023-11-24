@@ -4,8 +4,7 @@ var moment = require('moment');
 var ip = require('ip');
 var querystring = require('qs');
 var crypto = require('crypto');
-const request = require('request');
-require('dotenv').config();
+
 const orderService = require('../../components/order/OrderService');
 
 router.post('/', async function (req, res, next) {

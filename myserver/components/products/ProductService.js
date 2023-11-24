@@ -37,7 +37,11 @@ const getLimitedProducts = async (limit) => {
 };
 const getProductById = async (id) => {
   try {
-    return await ProductModel.findById(id).populate('brand', '');
+    const product = await ProductModel.findById(id).populate('brand', '');
+
+    const sizes = await product?.variances?.map((variance) => variance?.varianceDetail?.map((detail) => detail?.size));
+
+    return { ...product.toObject(), sizes: sizes.map((size) => size.size) };
   } catch (error) {
     console.log('Get products by id error', error);
     return null;

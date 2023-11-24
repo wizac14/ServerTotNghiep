@@ -1,6 +1,9 @@
 const UserModel = require('./UserModel');
 const userModel = require('./UserModel');
 const bcrypt = require('bcryptjs');
+
+
+
 //1. kiem tra email,password
 //2. kiem tra email co ton tai trong database khong
 //3. kiem tra password co dung ko
@@ -56,6 +59,48 @@ const register = async (email, password, name,address,phoneNumber) => {
     return false;
 
 }
+
+const changeForgotPassword = async (email, newPassword) => {
+    try {
+        const user = await userModel.findOne({ email: email })
+        console.log("INFO USER:", user);
+        if (user) {
+            const salt = bcrypt.genSaltSync(10);
+            const hash = bcrypt.hashSync(newPassword, salt);
+            user.password = hash
+            await user.save();
+            return true;
+        } else {
+            return false;
+            
+        }
+    } catch (error) {
+        console.log("Change Password got an error: ", error);
+        throw error;
+    }
+}
+
+
+const changePasswordPhone = async (phoneNumber, newPassword) => {
+    try {
+        const user = await userModel.findOne({ phoneNumber: phoneNumber })
+        if (user) {
+            const salt = bcrypt.genSaltSync(10);
+            const hash = bcrypt.hashSync(newPassword, salt);
+            user.password = hash
+            await user.save();
+            return true;
+        } else {
+            console.log("Khong tim thay user");
+            return false;
+            
+        }
+    } catch (error) {
+        console.log("Change Password got an error: ", error);
+        throw error;
+    }
+}
+
 //// //name: { type: String },
 // email: { type: String },
 // password: { type: String },
@@ -90,4 +135,4 @@ const updateUser = async (name, email, password, address,phoneNumber, gender,dob
         return false;
     }
 }
-module.exports = { login, register,updateUser };
+module.exports = { login, register,updateUser , changeForgotPassword, changePasswordPhone};
