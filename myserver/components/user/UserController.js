@@ -2,6 +2,9 @@ const userService = require('./UserService');
 const mailer = require('nodemailer');
 const UserModel = require('./UserModel');
 
+
+
+
 const login = async (email, password) => {
     return await userService.login(email, password);
 }
@@ -16,7 +19,7 @@ const sendVerifyCode = async (email, subject, verifyCode) => {
             from: "ADMIN <thefivemensshoesshop@gmail.com>",
             to: email,
             subject: subject,
-            html: "Your code is : " + verifyCode
+            html: "Mã OTP của bạn là : " + verifyCode + "<br/>" + "Mã OTP có hiệu lực trong 5 phút. Vui lòng không cung cấp mã OTP này cho bất cứ ai!"
         }
         await UserModel.updateOne({ email }, { verificationCode: verifyCode, });
         return await transporter.sendMail(mailOptions);
@@ -27,13 +30,20 @@ const sendVerifyCode = async (email, subject, verifyCode) => {
     return false;
 }
 
+const sendVerifyCodePhone = async (phoneNumber, subject, verifyCode) => {
+   try {
+        
+   }catch(error){
+       console.log(error);
+   }
+}
 const sendVerifyCodeNew = async (email, subject, verifyCode) => {
     try {
         const mailOptions = {
             from: "Admin <thefivemensshoesshop@gmail.com>",
             to: email,
             subject: subject,
-            html: "Your new code is : " + verifyCode
+            html: "Mã OTP của bạn là :  " + verifyCode + "<br/>" + "Mã OTP có hiệu lực trong 5 phút. Vui lòng không cung cấp mã OTP này cho bất cứ ai!"
         }
         await transporter.sendMail(mailOptions);
         return true
@@ -52,7 +62,7 @@ const verifyCode = async (email, verifyCode) => {
         if (user) {
             console.log("=====>", user.verificationCode);
             if (user.verificationCode === verifyCode) {
-                console.log("Nay la user voi code nhap vao",user.verificationCode)
+                console.log("Nay la user voi code nhap vao", user.verificationCode)
                 await UserModel.updateOne({ email }, { isVerified: true });
                 return true;
             } else {
@@ -75,6 +85,15 @@ const changeForgotPassword = async (email, newPassword) => {
     }
 }
 
+
+const changePasswordPhone = async (phoneNumber, newPassword) => {
+    try {
+        return await userService.changePasswordPhone(phoneNumber, newPassword);
+    } catch (error) {
+        throw error;
+    }
+}
+
 const transporter = mailer.createTransport({
     pool: true,
     host: 'smtp.gmail.com',
@@ -88,9 +107,9 @@ const transporter = mailer.createTransport({
 })
 
 
-const updateUser = async (name, email, password, address,phoneNumber, gender, dob,image , isVerified, verificationCode) => {
+const updateUser = async (name, email, password, address, phoneNumber, gender, dob, image, isVerified, verificationCode) => {
     try {
-        return await userService.updateUser(name, email, password, address,phoneNumber, gender, dob,image ,isVerified, verificationCode);
+        return await userService.updateUser(name, email, password, address, phoneNumber, gender, dob, image, isVerified, verificationCode);
 
     } catch (error) {
         return false;
@@ -98,4 +117,4 @@ const updateUser = async (name, email, password, address,phoneNumber, gender, do
 }
 
 
-module.exports = { login, register, sendVerifyCodeNew, sendVerifyCode, verifyCode, changeForgotPassword, updateUser };
+module.exports = { login, register, sendVerifyCodeNew, sendVerifyCode, verifyCode, changeForgotPassword, updateUser, changePasswordPhone,sendVerifyCodePhone };
