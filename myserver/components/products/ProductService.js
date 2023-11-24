@@ -246,26 +246,18 @@ const searchByName = async (name) => {
   }
 };
 
-const searchProductsByBrand = async (brandName, productName) => {
+const searchProductsByBrand = async (query) => {
   try {
-    const brand = await BrandModel.findOne({ name: brandName });
+    // Tìm ID của thương hiệu dựa trên tên
+    const brand = await BrandModel.findOne({ name: query });
 
     if (!brand) {
       console.log('Không tìm thấy thương hiệu.');
       return null;
     }
 
-    let products;
-    if (productName) {
-      products = await ProductModel.find({
-        brand: brand._id,
-        title: { $regex: new RegExp(productName, 'i') }, // Tìm kiếm tên sản phẩm có chứa từ khóa productName
-      }).populate('brand', '');
-    } else {
-      products = await ProductModel.find({ brand: brand._id }).populate('brand', '');
-    }
-
-    return products;
+    // Sử dụng ID của thương hiệu để tìm sản phẩm
+    return await ProductModel.find({ brand: brand._id }).populate('brand', ''); // Nếu cần hiển thị thông tin về thương hiệu
   } catch (error) {
     console.log('Lỗi khi tìm kiếm sản phẩm theo thương hiệu:', error);
     return null;
