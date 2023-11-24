@@ -70,9 +70,9 @@ const searchByName = async (name) => {
   }
 };
 
-const searchProductsByBrand = async (query) => {
+const searchProductsByBrand = async (brandName, productName) => {
   try {
-    return await ProductService.searchProductsByBrand(query);
+    return await ProductService.searchProductsByBrand(brandName, productName);
   } catch (error) {
     return null;
   }
