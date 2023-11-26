@@ -179,6 +179,24 @@ const getProductCountInOrder = async (orderId) => {
   }
 };
 
+const updateOrderStatus = async (orderId, newStatus) => {
+  try {
+    let order = await OrderModel.findById(orderId);
+
+    if (!order) {
+      throw Error('Cannot found Order with id: ' + orderId);
+    }
+
+    if (newStatus === OrderStatusEnum.REFUNDED || newStatus === OrderStatusEnum.CANCELED) {
+      await productService.updateQuantityForProductByOrder(order?.detail, newStatus);
+    }
+    await OrderModel.updateOne({ _id: orderId }, { status: newStatus });
+    return { message: 'Update successful' };
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   createOrder,
   getAllOrders,
@@ -186,4 +204,5 @@ module.exports = {
   getUserOrders,
   getUserOrderCount,
   getProductCountInOrder,
+  updateOrderStatus,
 };

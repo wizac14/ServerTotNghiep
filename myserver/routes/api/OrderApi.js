@@ -79,4 +79,15 @@ router.get('/user-orders/:userId', async (req, res) => {
   }
 });
 
+router.put('/update-status', async function (req, res, next) {
+  const { orderId, status } = req.body;
+  console.log(req.body);
+  try {
+    const orders = await orderService.updateOrderStatus(orderId, status);
+    return res.status(200).json({ orders });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

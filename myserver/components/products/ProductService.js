@@ -140,7 +140,6 @@ const updateProductById = async (id, updateProduct) => {
 
 const getQuatityByProductIdAndSizeAndColor = async (product_id, size, color) => {
   try {
-    console.log(product_id, size, color);
     const product = await ProductModel.aggregate([
       {
         $match: {
@@ -174,7 +173,6 @@ const getQuatityByProductIdAndSizeAndColor = async (product_id, size, color) => 
     ]);
     return product[0];
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
