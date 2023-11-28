@@ -122,4 +122,31 @@ const updateUser = async (name, email, password, address, phoneNumber, gender, d
     return false;
   }
 };
-module.exports = { login, register, updateUser, changeForgotPassword, changePasswordPhone };
+
+const getAllUsers = async () => {
+  try {
+    return await userModel.find();
+  } catch (error) {
+    console.log('Get all users error', error);
+    throw error;
+  }
+};
+const getUserById = async (id) => {
+  try {
+  return await userModel.findById(id);
+  } catch (error) {
+  console.log('Get users by id error', error);
+  return null;
+  }
+};
+const deleteUserById = async (id) => {
+  try {
+    await userModel.findByIdAndDelete(id);
+    return true;
+  } catch (error) {
+      console('register error: ', error);
+    console.log('Delete users by id error', error);
+    return false;
+  }
+}
+module.exports = { login, register, updateUser, changeForgotPassword, changePasswordPhone, getAllUsers, getUserById, deleteUserById };

@@ -136,6 +136,27 @@ const updateUser = async (
     return false;
   }
 };
+const getAllUsers = async () => {
+  try {
+    return await userService.getAllUsers();
+  } catch (error) {
+    throw error;
+  }
+};
+const getUserById = async (id) => {
+  try {
+    return await userService.getUserById(id);
+  } catch (error) {
+    return null;
+  }
+};
+const deleteUserById = async (id) => {
+  try {
+    return await userService.deleteUserById(id);
+  } catch (error) {
+    throw false;
+  }
+}
 
 module.exports = {
   login,
@@ -147,4 +168,7 @@ module.exports = {
   updateUser,
   changePasswordPhone,
   sendVerifyCodePhone,
+  getAllUsers, 
+  getUserById, 
+  deleteUserById
 };
