@@ -187,6 +187,14 @@ const updateOrderStatus = async (orderId, newStatus) => {
       throw Error('Cannot found Order with id: ' + orderId);
     }
 
+    if (newStatus === OrderStatusEnum.COMPLETED) {
+      // Nếu trạng thái mới là COMPLETED, cập nhật trường isPaid
+      await OrderModel.updateOne({ _id: orderId }, { status: newStatus, isPaid: true });
+    } else {
+      // Nếu không phải trạng thái COMPLETED, không cập nhật trường isPaid
+      await OrderModel.updateOne({ _id: orderId }, { status: newStatus });
+    }
+
     if (newStatus === OrderStatusEnum.REFUNDED || newStatus === OrderStatusEnum.CANCELED) {
       await productService.updateQuantityForProductByOrder(order?.detail, newStatus);
     }
