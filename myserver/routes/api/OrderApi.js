@@ -80,10 +80,9 @@ router.get('/user-orders/:userId', async (req, res) => {
 });
 
 router.put('/update-status', async function (req, res, next) {
-  const { orderId, status } = req.body;
-  console.log(req.body);
+  const { orderId, status, isPaid } = req.body; // Lấy giá trị isPaid từ request body
   try {
-    const orders = await orderService.updateOrderStatus(orderId, status);
+    const orders = await orderService.updateOrderStatus(orderId, status, isPaid); // Truyền giá trị isPaid vào service
     return res.status(200).json({ orders });
   } catch (error) {
     return res.status(500).json({ error: error.message });
