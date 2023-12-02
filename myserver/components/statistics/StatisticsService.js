@@ -56,7 +56,7 @@ const createAggregateForTotalOrders = (filterDateType, orderStatus, fromDate, to
             },
             {
               createdAt: {
-                $lte: moment(toDate).startOf('date').toDate(),
+                $lte: moment(toDate).endOf('date').toDate(),
               },
             },
           ],
