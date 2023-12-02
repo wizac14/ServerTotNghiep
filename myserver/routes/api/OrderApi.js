@@ -7,6 +7,7 @@ var crypto = require('crypto');
 const request = require('request');
 require('dotenv').config();
 const orderService = require('../../components/order/OrderService');
+const orderController = require('../../components/order/OrderController');
 
 router.post('/', async function (req, res, next) {
   try {
@@ -88,5 +89,25 @@ router.put('/update-status', async function (req, res, next) {
     return res.status(500).json({ error: error.message });
   }
 });
+//http://localhost:3000/api/order/getTotalAmount
+// router.get('/getTotalAmount', async (req, res, next) => {
+//   try {
+//     const { userId, isPaid, fromDate, toDate } = req.query;
+//     const totalAmount  = await orderController.getTotalAmountByUserAndStatus(userId, isPaid, fromDate, toDate);
+//     if (totalAmount) {
+//       return res.status(200).json({ result: true, totalAmount: totalAmount, message: 'Success' });
+//     }
+//     return res.status(400).json({ result: false, totalAmount: null, message: 'Failed' });
+//   } catch (error) {
+//     return res.status(500).json({ result: false, totalAmount: null });
+//   }
+// });
+router.get('/getTotalAmount', orderController.getTotalAmountByUserAndStatus);
+//http://localhost:3000/api/order/getTotalAmountByMonth
+router.get('/getTotalAmountByMonth', orderController.getTotalAmountByMonthAndStatus);
+//http://localhost:3000/api/order/getDailyPayments
+router.post('/getDailyPayments', orderController.getDailyPayments);
+//http://localhost:3000/api/order/getProductCountByDay
+router.get('/getProductCountByDay', orderController.getProductCountByDay);
 
 module.exports = router;
