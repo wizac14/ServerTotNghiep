@@ -179,6 +179,125 @@ const getProductCountInOrder = async (orderId) => {
   }
 };
 
+
+const calculateTotalAmountByUserAndStatus= async(userId, isPaid, fromDate, toDate) =>{
+  try {
+    const totalAmount = await OrderModel.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          isPaid: Boolean(isPaid),
+          createdAt: { $gte: new Date(fromDate), $lte: new Date(toDate) }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$totalAmount" }
+        }
+      }
+    ]);
+
+    return totalAmount.length > 0 ? totalAmount[0].total : 0;
+  } catch (error) {
+    throw error;
+  }
+}
+const calculateTotalAmountByMonthAndStatus= async (userId, isPaid) =>{
+  try {
+    const totalAmountByMonth = await OrderModel.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          isPaid: Boolean(isPaid)
+        }
+      },
+      {
+        $group: {
+          _id: { month: { $month: "$createdAt" }, year: { $year: "$createdAt" } },
+          totalAmount: { $sum: "$totalAmount" },
+          totalProducts: { $sum: { $size: "$detail" } }
+        }
+        
+      }
+      ,
+      {
+        $sort: {
+          "_id.year": 1,
+          "_id.month": 1
+        }
+      }
+    ]);
+
+    return totalAmountByMonth;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+const getDailyPayments = async (userId, isPaid,fromDate, toDate) => {
+  try {
+    const result = await OrderModel.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          isPaid: Boolean(isPaid),
+          createdAt: { $gte: new Date(fromDate), $lte: new Date(toDate) }
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          totalAmount: { $sum: "$totalAmount" },
+          totalProducts: { $sum: { $size: "$detail" } }
+        }
+      }
+      ,
+      {
+        $sort: { _id: 1 } // Sắp xếp theo ngày tăng dần
+      }
+      
+    ]);
+
+    return result.map(item => {
+      return {
+        date: item._id,
+        totalAmount: item.totalAmount,
+        totalProducts:item.totalProducts
+      };
+    });
+  } catch (error) {
+    throw error;
+  }
+}
+const getProductCountByDay = async (userId, fromDate, toDate) => {
+  try {
+    const result = await OrderModel.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          createdAt: { $gte: new Date(fromDate), $lte: new Date(toDate) },
+          isPaid: true // Thêm điều kiện đã thanh toán
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          totalProducts: { $sum: { $size: "$detail" } }
+        }
+      },
+      {
+        $sort: { _id: 1 } // Sắp xếp theo ngày tăng dần
+      }
+    ]);
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 module.exports = {
   createOrder,
   getAllOrders,
@@ -186,4 +305,8 @@ module.exports = {
   getUserOrders,
   getUserOrderCount,
   getProductCountInOrder,
+  calculateTotalAmountByUserAndStatus,
+  calculateTotalAmountByMonthAndStatus,
+  getDailyPayments,
+  getProductCountByDay
 };
