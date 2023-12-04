@@ -144,7 +144,6 @@ const updateProductById = async (id, updateProduct) => {
 
 const getQuatityByProductIdAndSizeAndColor = async (product_id, size, color) => {
   try {
-    console.log(product_id, size, color);
     const product = await ProductModel.aggregate([
       {
         $match: {
@@ -178,7 +177,6 @@ const getQuatityByProductIdAndSizeAndColor = async (product_id, size, color) => 
     ]);
     return product[0];
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -246,18 +244,26 @@ const searchByName = async (name) => {
   }
 };
 
-const searchProductsByBrand = async (query) => {
+const searchProductsByBrand = async (brandName, productName) => {
   try {
-    // Tìm ID của thương hiệu dựa trên tên
-    const brand = await BrandModel.findOne({ name: query });
+    const brand = await BrandModel.findOne({ name: brandName });
 
     if (!brand) {
       console.log('Không tìm thấy thương hiệu.');
       return null;
     }
 
-    // Sử dụng ID của thương hiệu để tìm sản phẩm
-    return await ProductModel.find({ brand: brand._id }).populate('brand', ''); // Nếu cần hiển thị thông tin về thương hiệu
+    let products;
+    if (productName) {
+      products = await ProductModel.find({
+        brand: brand._id,
+        title: { $regex: new RegExp(productName, 'i') }, // Tìm kiếm tên sản phẩm có chứa từ khóa productName
+      }).populate('brand', '');
+    } else {
+      products = await ProductModel.find({ brand: brand._id }).populate('brand', '');
+    }
+
+    return products;
   } catch (error) {
     console.log('Lỗi khi tìm kiếm sản phẩm theo thương hiệu:', error);
     return null;
