@@ -136,9 +136,9 @@ const updateUser = async (
     return false;
   }
 };
-const getAllUsers = async () => {
+const getAllUsers = async (role) => {
   try {
-    return await userService.getAllUsers();
+    return await userService.getAllUsers(role);
   } catch (error) {
     throw error;
   }

@@ -123,9 +123,9 @@ const updateUser = async (name, email, password, address, phoneNumber, gender, d
   }
 };
 
-const getAllUsers = async () => {
+const getAllUsers = async (role) => {
   try {
-    return await userModel.find();
+    return await userModel.find(role);
   } catch (error) {
     console.log('Get all users error', error);
     throw error;
