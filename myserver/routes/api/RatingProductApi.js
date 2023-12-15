@@ -1,18 +1,35 @@
 const express = require('express');
 const router = express.Router();
-const RatingController = require('../../components/rating/RatingController');
+const RatingPRoductController = require('../../components/rating/RatingProductController');
 const uploadVideo = require('../../middle/UploadVideo');
 const upload = require('../../middle/UploadImg');
 const uploadFile=require('../../middle/UploadFile')
 const firebaseAdmin = require('../../utils/firebaseAdmin');
 
 
-//http://localhost:3000/api/rating/get-by-id?orderId=
+//http://localhost:3000/api/ratingProduct/get-by-id?productId=
 
 router.get('/get-by-id', async (req, res, next) => {
   try {
-    const { orderId } = req.query;
-    const rating = await RatingController.getRatingById(orderId);
+    const { productId } = req.query;
+    const rating = await RatingPRoductController.getRatingById(productId);
+   if(rating)
+   {
+    return res.status(200).json({ result: true, rating: rating });
+
+   }
+   return res.status(400).json({ result: true, rating: false });
+   
+  } catch (error) {
+    return res.status(500).json({ result: false, rating: null });
+  }
+});
+//http://localhost:3000/api/ratingProduct/get-by-star?idProduct=&star=
+
+router.get('/get-by-star', async (req, res, next) => {
+  try {
+    const { idProduct,star } = req.query;
+    const rating = await RatingPRoductController.getRatingByStar(idProduct,star);
    if(rating)
    {
     return res.status(200).json({ result: true, rating: rating });
@@ -25,7 +42,7 @@ router.get('/get-by-id', async (req, res, next) => {
   }
 });
 
-//http://localhost:3000/api/rating/add-new-rating
+//http://localhost:3000/api/ratingProduct/add-new-rating
 // API để thêm mới đánh giá
 router.post('/add-new-rating', [upload.single('image'), uploadVideo.single('video')], async (req, res, next) => {
   try {
@@ -41,8 +58,8 @@ router.post('/add-new-rating', [upload.single('image'), uploadVideo.single('vide
     //   body = { ...body, video: videoUrl };
     // }
 
-    const { idUser, idOrder, ratingStatus, star, image, video } = body;
-    const rating = RatingController.createRaing(idUser, idOrder, ratingStatus, star, image, video);
+    const { idUser, idOrder,idProduct, ratingStatus, star, image, video,israting } = body;
+    const rating = RatingPRoductController.createRaingPRoduct(idUser, idOrder,idProduct, ratingStatus, star, image, video,israting);
 
     if (rating) {
       return res.status(200).json({ result: true, rating: true });
@@ -120,7 +137,7 @@ router.post('/upload-video', uploadFile.single('video'), async (req, res, next) 
 });
 
 
-//http://localhost:3000/api/ratingProduct/add
+//http://localhost:3000/api/rating/add
 router.post('/add', uploadFile.fields([{ name: 'image', maxCount: 1 }, { name: 'video', maxCount: 1 }]), async (req, res, next) => {
   try {
     const { files, body } = req;
@@ -138,8 +155,8 @@ router.post('/add', uploadFile.fields([{ name: 'image', maxCount: 1 }, { name: '
         body.video = videoUrl;
       }
 
-      const { idUser, idOrder, ratingStatus, star, image, video } = body;
-      const rating = RatingController.createRaing(idUser, idOrder, ratingStatus, star, image, video);
+      const { idUser, idOrder,idProduct, ratingStatus, star, image, video } = body;
+      const rating = RatingPRoductController.createRaingPRoduct(idUser, idOrder,idProduct, ratingStatus, star, image, video);
 
       if (rating) {
         return res.status(200).json({ result: true, rating: true });
@@ -150,6 +167,9 @@ router.post('/add', uploadFile.fields([{ name: 'image', maxCount: 1 }, { name: '
     res.status(500).json({ message: error.message });
   }
 });
+
+//http://localhost:3000/api/ratingProduct/updateCountHearts?id=
+router.post('/updateCountHearts', RatingPRoductController.updateCountHeartsController);
 
 
 module.exports = router;
