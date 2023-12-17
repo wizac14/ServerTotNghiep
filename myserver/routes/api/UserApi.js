@@ -10,6 +10,7 @@ const client = require('twilio')(accountSid, authToken);
 // const bodyParser = require('body-parser');
 const userController = require('../../components/user/UserController');
 const upload = require('../../middle/UploadImg');
+const { validationRegister } = require('../../middle/Validation');
 
 //http://localhost:3000/api/user/login
 // api login user
@@ -41,7 +42,7 @@ router.post('/login', async (req, res, next) => {
 });
 
 //http://localhost:3000/api/user/register
-router.post('/register', async (req, res, next) => {
+router.post('/register',[validationRegister], async (req, res, next) => {
   try {
     const { email, password, name, address, phoneNumber } = req.body;
     const user = await userController.register(email, password, name, address, phoneNumber);
