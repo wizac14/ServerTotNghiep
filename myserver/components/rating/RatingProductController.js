@@ -3,23 +3,23 @@ const RatingPRoductService = require('./RatingProductService');
 const getRatingById = async (productId) => {
   try {
     return await RatingPRoductService.getRatingsByProductId(productId);
-} catch (error) { 
+  } catch (error) {
     return null;
-}
+  }
 };
-const getRatingByStar = async (idProduct,star) => {
+const getRatingByStar = async (idProduct, star) => {
   try {
-    return await RatingPRoductService.getRatingsByProductStar(idProduct,star);
-} catch (error) { 
+    return await RatingPRoductService.getRatingsByProductStar(idProduct, star);
+  } catch (error) {
     return null;
-}
+  }
 };
 const updateCountHeartsController = async (req, res) => {
   try {
-    const { id,action} = req.query;
-    const updatedRating = await RatingPRoductService.updateCountHearts(id, action);
+    const { id, action, idUser } = req.body; // Lấy cả idUser từ request body
+    const updatedRating = await RatingPRoductService.updateCountHearts(id, action, idUser);
     if (updatedRating) {
-      res.status(200).json({result:true,updatedRating: updatedRating});
+      res.status(200).json({ result: true, updatedRating: updatedRating });
     } else {
       res.status(500).json({ error: 'Failed to update countHearts' });
     }
@@ -28,14 +28,35 @@ const updateCountHeartsController = async (req, res) => {
   }
 };
 
-const createRaingPRoduct = async (idUser, idOder, idProduct,ratingStatus, star, image,video,israting) => {
+const createRaingPRoduct = async (
+  idUser,
+  idOder,
+  idProduct,
+  ratingStatus,
+  star,
+  image,
+  video,
+  israting
+) => {
   try {
-    return await RatingPRoductService.createRatingProduct(idUser, idOder,idProduct, ratingStatus, star, image,video,israting);
+    return await RatingPRoductService.createRatingProduct(
+      idUser,
+      idOder,
+      idProduct,
+      ratingStatus,
+      star,
+      image,
+      video,
+      israting
+    );
   } catch (error) {
     throw error;
   }
 };
 
-
-
-module.exports = { createRaingPRoduct,getRatingById,getRatingByStar,updateCountHeartsController };
+module.exports = {
+  createRaingPRoduct,
+  getRatingById,
+  getRatingByStar,
+  updateCountHeartsController,
+};
