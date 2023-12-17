@@ -28,6 +28,8 @@ const OrderAPIRouter = require('./routes/api/OrderApi');
 const paymentAPIRouter = require('./routes/api/PaymentApi');
 const favoriteAPIRouter = require('./routes/api/FavoriteApi');
 const statisticsAPIRouter = require('./routes/api/StatisticsApi');
+const ratingAPIRouter = require('./routes/api/RatingApi');
+const ratingProductAPIRouter = require('./routes/api/RatingProductApi');
 
 var app = express();
 //cors
@@ -83,6 +85,10 @@ app.use('/api/payment', paymentAPIRouter);
 //http:localhost:3000/api/favorite
 app.use('/api/favorite', favoriteAPIRouter);
 app.use('/api/statistics', statisticsAPIRouter);
+//http:localhost:3000/api/rating
+app.use('/api/rating', ratingAPIRouter);
+//http:localhost:3000/api/ratingProduct
+app.use('/api/ratingProduct', ratingProductAPIRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

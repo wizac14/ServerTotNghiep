@@ -287,10 +287,11 @@ router.delete('/delete/:id', async (req, res, next) => {
   }
 });
 
-// http://localhost:3000/api/user/get-all
+// http://localhost:3000/api/user/get-all?role=1
 router.get('/get-all', [], async (req, res, next) => {
   try {
-    const user = await userController.getAllUsers();
+    const role = req.query
+    const user = await userController.getAllUsers(role);
     return res.status(200).json({ result: true, user: user });
   } catch (error) {
     console.log('Get all error: ', error);
