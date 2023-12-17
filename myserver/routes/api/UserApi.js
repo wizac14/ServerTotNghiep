@@ -18,25 +18,33 @@ router.post('/login', async (req, res, next) => {
     const { email, password } = req.body;
     const user = await userController.login(email, password);
     if (user) {
-      // tao token
-      const token = jwt.sign({ user }, 'secret', { expiresIn: '1h' });
-      const returnData = {
-        error: false,
-        responseTimestamp: new Date(),
-        statusCode: 200,
-        data: {
-          token: token,
-          user: user,
-        },
-      };
-      return res.status(200).json(returnData);
+      if (user.isActive) {
+        // tao token
+        const token = jwt.sign({ user }, 'secret', { expiresIn: '1h' });
+        const returnData = {
+          error: false,
+          responseTimestamp: new Date(),
+          statusCode: 200,
+          data: {
+            token: token,
+            user: user,
+          },
+        };
+        return res.status(200).json(returnData);
+      } else {
+        return res
+          .status(400)
+          .json({ result: false, user: null, message: 'Tài khoản của bạn đã bị vô hiệu hóa' });
+      }
     } else {
-      return res.status(400).json({ result: false, user: null });
+      return res
+        .status(400)
+        .json({ result: false, user: null, message: 'Email or password is incorrect' });
     }
   } catch (error) {
     console.log(error);
     next(error); //danh cho web
-    return res.status(500).json({ result: false, message: 'loi he thong' });
+    return res.status(500).json({ result: false, message: 'Lỗi hệ thống' });
   }
 });
 
@@ -262,36 +270,45 @@ router.post('/confirm-otp', async (req, res) => {
 //http://localhost:3000/api/user/update/
 router.put('/update/:id', async (req, res, next) => {
   try {
-      const { id } = req.params
-      const { name, email, phoneNumber, address, gender, dob, image } = req.body;
-      const user = await userController.updateUser(id, name, email, phoneNumber, address, gender, dob, image);
-      console.log(user)
-      if (user) {
-          return res.status(200).json({ result: true, user: user, message: "Update Success" })
-      } else {
-          return res.status(400).json({ result: false, user: null, message: " user not exist" })
-      }
+    const { id } = req.params;
+    const { name, email, phoneNumber, address, gender, dob, image } = req.body;
+    const user = await userController.updateUser(
+      id,
+      name,
+      email,
+      phoneNumber,
+      address,
+      gender,
+      dob,
+      image
+    );
+    console.log(user);
+    if (user) {
+      return res.status(200).json({ result: true, user: user, message: 'Update Success' });
+    } else {
+      return res.status(400).json({ result: false, user: null, message: ' user not exist' });
+    }
   } catch (error) {
-      console.log(error)
-      return res.status(500).json({ result: false, user: null })
+    console.log(error);
+    return res.status(500).json({ result: false, user: null });
   }
-})
+});
 
 // http://localhost:3000/api/user/delete/:id
 router.delete('/delete/:id', async (req, res, next) => {
   try {
-      const { id } = req.params;
-      const user = await userController.deleteUserById(id);
-      return res.status(200).json({ result: true, users: user  });
+    const { id } = req.params;
+    const user = await userController.deleteUserById(id);
+    return res.status(200).json({ result: true, users: user });
   } catch (error) {
-      return res.status(500).json({ result: false, users: null });
+    return res.status(500).json({ result: false, users: null });
   }
 });
 
 // http://localhost:3000/api/user/get-all?role=1
 router.get('/get-all', [], async (req, res, next) => {
   try {
-    const role = req.query
+    const role = req.query;
     const user = await userController.getAllUsers(role);
     return res.status(200).json({ result: true, user: user });
   } catch (error) {
@@ -310,5 +327,6 @@ router.get('/get-by-id', async (req, res, next) => {
     return res.status(500).json({ result: false, user: null });
   }
 });
+
 
 module.exports = router;
