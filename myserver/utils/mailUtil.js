@@ -1,6 +1,4 @@
 const nodemailer = require('nodemailer');
-const hbs = require('hbs');
-const path = require('path');
 
 const gmailTransporter = nodemailer.createTransport({
   pool: true,
