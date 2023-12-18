@@ -76,9 +76,29 @@ const updateCountHearts = async (id, action, idUser) => {
   }
 };
 
+const getAllProductRatings = async () => {
+  try {
+    const ratings = await RatingProductModel.find({}).populate('idUser').populate('idProduct');
+    return ratings;
+  } catch (error) {
+    throw new Error('Could not fetch all product ratings from the database');
+  }
+};
+
+const deleteRatingById = async (ratingId) => {
+  try {
+    const deletedRating = await RatingProductModel.findByIdAndDelete(ratingId);
+    return deletedRating;
+  } catch (error) {
+    throw new Error('Không thể xóa đánh giá: ' + error.message);
+  }
+};
+
 module.exports = {
   createRatingProduct,
   getRatingsByProductId,
   getRatingsByProductStar,
   updateCountHearts,
+  getAllProductRatings,
+  deleteRatingById,
 };
