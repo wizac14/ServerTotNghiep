@@ -27,6 +27,14 @@ const getAllProducts = async (offset, size) => {
     throw error;
   }
 };
+const getAllNewProducts = async () => {
+  try {
+    return await ProductModel.find().populate('brand', '');
+  } catch (error) {
+    console.log('Get all products error', error);
+    throw error;
+  }
+};
 const getLimitedProducts = async (limit) => {
   try {
     return await ProductModel.find().limit(limit).populate('brand', '');
@@ -282,4 +290,5 @@ module.exports = {
   searchProductsByBrand,
   getLimitedProducts,
   updateQuantityForProductByOrder,
+  getAllNewProducts,
 };

@@ -7,6 +7,13 @@ const getAllProducts = async (offset, size) => {
     throw error;
   }
 };
+const getAllNewProducts = async () => {
+  try {
+    return await ProductService.getAllNewProducts();
+  } catch (error) {
+    throw error;
+  }
+};
 const getLimitedProducts = async (limit) => {
   try {
     return await ProductService.getLimitedProducts(limit);
@@ -88,4 +95,5 @@ module.exports = {
   searchByName,
   searchProductsByBrand,
   getLimitedProducts,
+  getAllNewProducts,
 };
