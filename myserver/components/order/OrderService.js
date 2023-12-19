@@ -5,6 +5,8 @@ const productService = require('../products/ProductService');
 const { OrderStatusEnum } = require('./OrderStatusEnum');
 const { default: mongoose } = require('mongoose');
 const cartService = require('../cart/CartService');
+const mailService = require('../mail/MailService');
+const mailUtil = require('../../utils/mailUtil');
 
 const createOrder = async (orderData) => {
   try {
@@ -27,6 +29,7 @@ const createOrder = async (orderData) => {
       phoneNumber: phoneNumber.toString(),
     });
     await newOrder.save();
+    sendOrderConfirmationMail(newOrder?._id);
     return newOrder;
   } catch (error) {
     console.log(error);
@@ -122,6 +125,7 @@ const getOrderByOrderId = async (orderId) => {
         },
       },
     ]);
+
     return orders;
   } catch (error) {
     console.log(error);
@@ -318,6 +322,37 @@ const getProductCountByDay = async (userId, fromDate, toDate) => {
   }
 };
 
+const sendOrderConfirmationMail = async (orderId) => {
+  try {
+    const order = (await getOrderByOrderId(orderId)).at(0);
+
+    if (!order) {
+      throw Error('Cannot sendOrderConfirmationMail because order is null');
+    }
+
+    const mailOptions = {
+      from: 'The Five Mens Shop <thefivemensshoesshop@gmail.com>',
+      to: order?.user?.email,
+      subject: 'Xác Nhận Đơn Hàng',
+      template: 'order-confirmation',
+      context: {
+        userName: order?.user?.name,
+        address: order?.user?.address,
+        phoneNumber: order?.user?.phoneNumber,
+        email: order?.user?.email,
+        orderUUID: order?.uuid,
+        totalAmount: order?.totalAmount,
+        orderItems: order?.detail,
+        randomness: Date.now(),
+      },
+    };
+
+    mailService.sendMailWithTemplate(mailUtil.gmailTransporter, mailOptions);
+  } catch (error) {
+    console.error('Cannot sendOrderConfirmationMail: ', error.message);
+  }
+};
+
 module.exports = {
   createOrder,
   getAllOrders,
@@ -330,4 +365,5 @@ module.exports = {
   calculateTotalAmountByMonthAndStatus,
   getDailyPayments,
   getProductCountByDay,
+  sendOrderConfirmationMail,
 };

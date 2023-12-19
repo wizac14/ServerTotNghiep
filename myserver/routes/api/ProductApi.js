@@ -16,6 +16,16 @@ router.get('/get-all', [], async (req, res, next) => {
   }
 });
 
+router.get('/get-all-new', [], async (req, res, next) => {
+  try {
+    const products = await ProductController.getAllNewProducts();
+    return res.status(200).json({ result: true, products: products });
+  } catch (error) {
+    console.log('Get all error: ', error);
+    return res.status(500).json({ result: false, products: null });
+  }
+});
+
 // http://localhost:3000/api/product/get-by-id?id=
 // api get product by id
 router.get('/get-by-id', async (req, res, next) => {
