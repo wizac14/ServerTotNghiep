@@ -3,7 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 
 const accountSid = 'AC5f766bfe64dd2ab23d891861d3e81ddd';
-const authToken = '20bf068e5731abafb1c31db3f15c06e8';
+const authToken = '4004797e8187388d104009a996bbab15';
 const client = require('twilio')(accountSid, authToken);
 
 // const twilio = require('twilio');
@@ -42,7 +42,7 @@ router.post('/login', async (req, res, next) => {
 });
 
 //http://localhost:3000/api/user/register
-router.post('/register',[validationRegister], async (req, res, next) => {
+router.post('/register', [validationRegister], async (req, res, next) => {
   try {
     const { email, password, name, address, phoneNumber } = req.body;
     const user = await userController.register(email, password, name, address, phoneNumber);
@@ -263,36 +263,45 @@ router.post('/confirm-otp', async (req, res) => {
 //http://localhost:3000/api/user/update/
 router.put('/update/:id', async (req, res, next) => {
   try {
-      const { id } = req.params
-      const { name, email, phoneNumber, address, gender, dob, image } = req.body;
-      const user = await userController.updateUser(id, name, email, phoneNumber, address, gender, dob, image);
-      console.log(user)
-      if (user) {
-          return res.status(200).json({ result: true, user: user, message: "Update Success" })
-      } else {
-          return res.status(400).json({ result: false, user: null, message: " user not exist" })
-      }
+    const { id } = req.params;
+    const { name, email, phoneNumber, address, gender, dob, image } = req.body;
+    const user = await userController.updateUser(
+      id,
+      name,
+      email,
+      phoneNumber,
+      address,
+      gender,
+      dob,
+      image
+    );
+    console.log(user);
+    if (user) {
+      return res.status(200).json({ result: true, user: user, message: 'Update Success' });
+    } else {
+      return res.status(400).json({ result: false, user: null, message: ' user not exist' });
+    }
   } catch (error) {
-      console.log(error)
-      return res.status(500).json({ result: false, user: null })
+    console.log(error);
+    return res.status(500).json({ result: false, user: null });
   }
-})
+});
 
 // http://localhost:3000/api/user/delete/:id
 router.delete('/delete/:id', async (req, res, next) => {
   try {
-      const { id } = req.params;
-      const user = await userController.deleteUserById(id);
-      return res.status(200).json({ result: true, users: user  });
+    const { id } = req.params;
+    const user = await userController.deleteUserById(id);
+    return res.status(200).json({ result: true, users: user });
   } catch (error) {
-      return res.status(500).json({ result: false, users: null });
+    return res.status(500).json({ result: false, users: null });
   }
 });
 
 // http://localhost:3000/api/user/get-all?role=1
 router.get('/get-all', [], async (req, res, next) => {
   try {
-    const role = req.query
+    const role = req.query;
     const user = await userController.getAllUsers(role);
     return res.status(200).json({ result: true, user: user });
   } catch (error) {
