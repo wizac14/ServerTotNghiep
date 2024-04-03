@@ -5,6 +5,8 @@ const productService = require('../products/ProductService');
 const { OrderStatusEnum } = require('./OrderStatusEnum');
 const { default: mongoose } = require('mongoose');
 const cartService = require('../cart/CartService');
+const mailService = require('../mail/MailService');
+const mailUtil = require('../../utils/mailUtil');
 
 const createOrder = async (orderData) => {
   try {
@@ -27,6 +29,7 @@ const createOrder = async (orderData) => {
       phoneNumber: phoneNumber.toString(),
     });
     await newOrder.save();
+    sendOrderConfirmationMail(newOrder?._id);
     return newOrder;
   } catch (error) {
     console.log(error);
@@ -122,6 +125,7 @@ const getOrderByOrderId = async (orderId) => {
         },
       },
     ]);
+
     return orders;
   } catch (error) {
     console.log(error);
@@ -179,6 +183,176 @@ const getProductCountInOrder = async (orderId) => {
   }
 };
 
+const updateOrderStatus = async (orderId, newStatus) => {
+  try {
+    let order = await OrderModel.findById(orderId);
+
+    if (!order) {
+      throw Error('Cannot found Order with id: ' + orderId);
+    }
+
+    if (newStatus === OrderStatusEnum.COMPLETED) {
+      // Nếu trạng thái mới là COMPLETED, cập nhật trường isPaid
+      await OrderModel.updateOne({ _id: orderId }, { status: newStatus, isPaid: true });
+    } else {
+      // Nếu không phải trạng thái COMPLETED, không cập nhật trường isPaid
+      await OrderModel.updateOne({ _id: orderId }, { status: newStatus });
+    }
+
+    if (newStatus === OrderStatusEnum.REFUNDED || newStatus === OrderStatusEnum.CANCELED) {
+      await productService.updateQuantityForProductByOrder(order?.detail, newStatus);
+    }
+    await OrderModel.updateOne({ _id: orderId }, { status: newStatus });
+    return { message: 'Update successful' };
+  } catch (error) {
+    throw error;
+  }
+};
+
+const calculateTotalAmountByUserAndStatus = async (userId, isPaid, fromDate, toDate) => {
+  try {
+    const totalAmount = await OrderModel.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          isPaid: Boolean(isPaid),
+          createdAt: { $gte: new Date(fromDate), $lte: new Date(toDate) },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$totalAmount' },
+        },
+      },
+    ]);
+
+    return totalAmount.length > 0 ? totalAmount[0].total : 0;
+  } catch (error) {
+    throw error;
+  }
+};
+const calculateTotalAmountByMonthAndStatus = async (userId, isPaid) => {
+  try {
+    const totalAmountByMonth = await OrderModel.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          isPaid: Boolean(isPaid),
+        },
+      },
+      {
+        $group: {
+          _id: { month: { $month: '$createdAt' }, year: { $year: '$createdAt' } },
+          totalAmount: { $sum: '$totalAmount' },
+          totalProducts: { $sum: { $size: '$detail' } },
+        },
+      },
+      {
+        $sort: {
+          '_id.year': 1,
+          '_id.month': 1,
+        },
+      },
+    ]);
+
+    return totalAmountByMonth;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+const getDailyPayments = async (userId, isPaid, fromDate, toDate) => {
+  try {
+    const result = await OrderModel.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          isPaid: Boolean(isPaid),
+          createdAt: { $gte: new Date(fromDate), $lte: new Date(toDate) },
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          totalAmount: { $sum: '$totalAmount' },
+          totalProducts: { $sum: { $size: '$detail' } },
+        },
+      },
+      {
+        $sort: { _id: 1 }, // Sắp xếp theo ngày tăng dần
+      },
+    ]);
+
+    return result.map((item) => {
+      return {
+        date: item._id,
+        totalAmount: item.totalAmount,
+        totalProducts: item.totalProducts,
+      };
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+const getProductCountByDay = async (userId, fromDate, toDate) => {
+  try {
+    const result = await OrderModel.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          createdAt: { $gte: new Date(fromDate), $lte: new Date(toDate) },
+          isPaid: true, // Thêm điều kiện đã thanh toán
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          totalProducts: { $sum: { $size: '$detail' } },
+        },
+      },
+      {
+        $sort: { _id: 1 }, // Sắp xếp theo ngày tăng dần
+      },
+    ]);
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const sendOrderConfirmationMail = async (orderId) => {
+  try {
+    const order = (await getOrderByOrderId(orderId)).at(0);
+
+    if (!order) {
+      throw Error('Cannot sendOrderConfirmationMail because order is null');
+    }
+
+    const mailOptions = {
+      from: 'The Five Mens Shop <thefivemensshoesshop@gmail.com>',
+      to: order?.user?.email,
+      subject: 'Xác Nhận Đơn Hàng',
+      template: 'order-confirmation',
+      context: {
+        userName: order?.user?.name,
+        address: order?.user?.address,
+        phoneNumber: order?.user?.phoneNumber,
+        email: order?.user?.email,
+        orderUUID: order?.uuid,
+        totalAmount: order?.totalAmount,
+        orderItems: order?.detail,
+        randomness: Date.now(),
+      },
+    };
+
+    mailService.sendMailWithTemplate(mailUtil.gmailTransporter, mailOptions);
+  } catch (error) {
+    console.error('Cannot sendOrderConfirmationMail: ', error.message);
+  }
+};
+
 module.exports = {
   createOrder,
   getAllOrders,
@@ -186,4 +360,10 @@ module.exports = {
   getUserOrders,
   getUserOrderCount,
   getProductCountInOrder,
+  updateOrderStatus,
+  calculateTotalAmountByUserAndStatus,
+  calculateTotalAmountByMonthAndStatus,
+  getDailyPayments,
+  getProductCountByDay,
+  sendOrderConfirmationMail,
 };
