@@ -6,8 +6,6 @@ const accountSid = 'AC5f766bfe64dd2ab23d891861d3e81ddd';
 const authToken = '4004797e8187388d104009a996bbab15';
 const client = require('twilio')(accountSid, authToken);
 
-// const twilio = require('twilio');
-// const bodyParser = require('body-parser');
 const userController = require('../../components/user/UserController');
 const upload = require('../../middle/UploadImg');
 const { validationRegister } = require('../../middle/Validation');
